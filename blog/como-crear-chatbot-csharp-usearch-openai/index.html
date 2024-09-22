@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cómo Crear un Chatbot con C#, Unum USearch y OpenAI | λ Cosme Zamudio</title>
+<meta name="title" content="Cómo Crear un Chatbot con C#, Unum USearch y OpenAI" />
+<meta name="description" content="Cómo Crear un Chatbot con C#, Unum USearch y OpenAI
+
+Este tutorial está basado en una transcripción de un video generada con el modelo whisper y ChatGPT o1-preview.
+Codigo Completo
+
+Una de las solicitudes más comunes de los clientes interesados en trabajar con inteligencia artificial es desarrollar un chatbot que pueda responder en lenguaje natural. En este artículo, exploraremos cómo implementar un chatbot utilizando las librerías proporcionadas por OpenAI y una pequeña base de datos vectorial llama USearch. Este enfoque no es el único, pero es una forma efectiva de abordar el problema." />
+<meta name="keywords" content="csharp,usearch,openai,llm,ai,programacion," />
+
+
+<meta property="og:url" content="http://localhost:1313/blog/como-crear-chatbot-csharp-usearch-openai/">
+  <meta property="og:site_name" content="λ Cosme Zamudio">
+  <meta property="og:title" content="Cómo Crear un Chatbot con C#, Unum USearch y OpenAI">
+  <meta property="og:description" content="Cómo Crear un Chatbot con C#, Unum USearch y OpenAI Este tutorial está basado en una transcripción de un video generada con el modelo whisper y ChatGPT o1-preview. Codigo Completo
+Una de las solicitudes más comunes de los clientes interesados en trabajar con inteligencia artificial es desarrollar un chatbot que pueda responder en lenguaje natural. En este artículo, exploraremos cómo implementar un chatbot utilizando las librerías proporcionadas por OpenAI y una pequeña base de datos vectorial llama USearch. Este enfoque no es el único, pero es una forma efectiva de abordar el problema.">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2024-09-22T15:55:14-07:00">
+    <meta property="article:modified_time" content="2024-09-22T15:55:14-07:00">
+    <meta property="article:tag" content="Csharp">
+    <meta property="article:tag" content="Usearch">
+    <meta property="article:tag" content="Openai">
+    <meta property="article:tag" content="Llm">
+    <meta property="article:tag" content="Ai">
+    <meta property="article:tag" content="Programacion">
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Cómo Crear un Chatbot con C#, Unum USearch y OpenAI">
+  <meta name="twitter:description" content="Cómo Crear un Chatbot con C#, Unum USearch y OpenAI Este tutorial está basado en una transcripción de un video generada con el modelo whisper y ChatGPT o1-preview. Codigo Completo
+Una de las solicitudes más comunes de los clientes interesados en trabajar con inteligencia artificial es desarrollar un chatbot que pueda responder en lenguaje natural. En este artículo, exploraremos cómo implementar un chatbot utilizando las librerías proporcionadas por OpenAI y una pequeña base de datos vectorial llama USearch. Este enfoque no es el único, pero es una forma efectiva de abordar el problema.">
+
+
+
+
+  <meta itemprop="name" content="Cómo Crear un Chatbot con C#, Unum USearch y OpenAI">
+  <meta itemprop="description" content="Cómo Crear un Chatbot con C#, Unum USearch y OpenAI Este tutorial está basado en una transcripción de un video generada con el modelo whisper y ChatGPT o1-preview. Codigo Completo
+Una de las solicitudes más comunes de los clientes interesados en trabajar con inteligencia artificial es desarrollar un chatbot que pueda responder en lenguaje natural. En este artículo, exploraremos cómo implementar un chatbot utilizando las librerías proporcionadas por OpenAI y una pequeña base de datos vectorial llama USearch. Este enfoque no es el único, pero es una forma efectiva de abordar el problema.">
+  <meta itemprop="datePublished" content="2024-09-22T15:55:14-07:00">
+  <meta itemprop="dateModified" content="2024-09-22T15:55:14-07:00">
+  <meta itemprop="wordCount" content="1123">
+  <meta itemprop="keywords" content="Csharp,Usearch,Openai,Llm,Ai,Programacion">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: #fff;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+     
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #f2f2f2;
+  }
+
+  pre code {
+    color: #222;
+    display: block;
+    padding: 20px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    overflow-x: auto;
+  }
+
+  div.highlight pre {
+    background-color: initial;
+    color: initial;
+  }
+
+  div.highlight code {
+    background-color: unset;
+    color: unset;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #222;
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: #8b6fcb;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #333;
+      color: #ddd;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    strong,
+    b {
+      color: #eee;
+    }
+
+    a {
+      color: #8cc2dd;
+    }
+
+    code {
+      background-color: #777;
+    }
+
+    pre code {
+      color: #ddd;
+    }
+
+    blockquote {
+      color: #ccc;
+    }
+
+    textarea,
+    input {
+      background-color: #252525;
+      color: #ddd;
+    }
+
+    .helptext {
+      color: #aaa;
+    }
+  }
+
+</style>
+
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>λ Cosme Zamudio</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/links/">Links</a>
+
+<a href="/projects/">Proyectos</a>
+
+
+<a href="/blog">Blog</a>
+
+</nav>
+</header>
+  <main>
+
+<h1>Cómo Crear un Chatbot con C#, Unum USearch y OpenAI</h1>
+<p>
+  <i>
+    <time datetime='2024-09-22' pubdate>
+      22 Sep, 2024
+    </time>
+  </i>
+</p>
+
+<content>
+  <h2 id="cómo-crear-un-chatbot-con-c-unum-usearch-y-openai">Cómo Crear un Chatbot con C#, Unum USearch y OpenAI</h2>
+<blockquote>
+<p>Este tutorial está basado en una transcripción de un video generada con el modelo whisper y ChatGPT o1-preview.
+<a href="https://github.com/cosmez/ChatBotExample">Codigo Completo</a></p>
+</blockquote>
+<p>Una de las solicitudes más comunes de los clientes interesados en trabajar con inteligencia artificial es desarrollar un chatbot que pueda responder en lenguaje natural. En este artículo, exploraremos cómo implementar un chatbot utilizando las librerías proporcionadas por OpenAI y una pequeña base de datos vectorial llama USearch. Este enfoque no es el único, pero es una forma efectiva de abordar el problema.</p>
+<h2 id="introducción">Introducción</h2>
+<p>El objetivo es crear un chatbot que pueda interactuar con los usuarios de manera natural, respondiendo a sus consultas basándose en una base de conocimientos predefinida. Utilizaremos <strong>.NET 8</strong> y crearemos una aplicación de consola sin interfaz gráfica.</p>
+<h2 id="requisitos-previos">Requisitos Previos</h2>
+<p>Para seguir este tutorial, necesitarás:</p>
+<ul>
+<li>Una <strong>cuenta de <a href="https://platform.openai.com/docs/overview">OpenAI</a></strong> para acceder a sus modelos y APIs.</li>
+<li><strong><a href="https://visualstudio.microsoft.com/vs/community/">Visual Studio</a></strong> con soporte para .NET 8.</li>
+<li>Conocimientos básicos de C# y .NET.</li>
+</ul>
+<h2 id="paso-1-configuración-inicial">Paso 1: Configuración Inicial</h2>
+<h3 id="crear-la-aplicación-de-consola">Crear la Aplicación de Consola</h3>
+<p>Comienza abriendo Visual Studio y crea una nueva aplicación de consola en <strong>.NET 8</strong>:</p>
+<ol>
+<li>Selecciona <strong>Archivo &gt; Nuevo &gt; Proyecto</strong>.</li>
+<li>Elige <strong>Aplicación de Consola (.NET)</strong>.</li>
+<li>Nombra el proyecto, por ejemplo, <code>ChatBotExample</code>.</li>
+</ol>
+<h3 id="configurar-las-variables-de-entorno">Configurar las Variables de Entorno</h3>
+<p>Necesitas configurar tu clave de API de OpenAI como una variable de entorno:</p>
+<ol>
+<li>Ve a las variables de entorno de tu sistema.</li>
+<li>Crea una nueva variable llamada <code>OPENAI_API_KEY</code>.</li>
+<li>Establece su valor a tu clave de API de OpenAI.</li>
+</ol>
+<h2 id="paso-2-instalación-de-librerías-necesarias">Paso 2: Instalación de Librerías Necesarias</h2>
+<p>Para interactuar con OpenAI y manejar la base de datos vectorial, necesitamos instalar algunas librerías:</p>
+<h3 id="librería-de-openai">Librería de OpenAI</h3>
+<p>Instala la librería oficial de OpenAI para .NET (Prerelease):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>dotnet add package OpenAI --prerelease
+</span></span></code></pre></div><h3 id="librería-para-la-base-de-datos-vectorial">Librería para la Base de Datos Vectorial</h3>
+<p>Usaremos <strong><a href="https://unum-cloud.github.io/usearch/csharp/index.html">Unum Usearch</a></strong> para manejar nuestra base de datos vectorial:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>dotnet add package Cloud.Unum.USearch
+</span></span></code></pre></div><h3 id="otras-dependencias">Otras Dependencias</h3>
+<p>También necesitaremos:</p>
+<ul>
+<li><strong>SQLite</strong> para manejar nuestra base de datos local.</li>
+<li><strong>Dapper</strong> para facilitar las operaciones con la base de datos.</li>
+</ul>
+<p>Instálalos usando:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>dotnet add package Microsoft.Data.Sqlite
+</span></span><span style="display:flex;"><span>dotnet add package Dapper
+</span></span></code></pre></div><h2 id="paso-3-preparación-de-la-base-de-conocimientos">Paso 3: Preparación de la Base de Conocimientos</h2>
+<p>Necesitamos un dataset que contiene consultas y respuestas relacionadas con una universidad. Para este ejemplo usaremos el dataset de <a href="https://huggingface.co/datasets/HuggMaxi/preguntasEtiquetadas">huggingface</a> convertido a <a href="https://github.com/cosmez/ChatBotExample/blob/master/ChatBot/dataset.db">SQLite</a></p>
+<h3 id="cargar-el-dataset">Cargar el Dataset</h3>
+<ol>
+<li>Coloca el archivo del dataset en una carpeta dentro de tu proyecto.</li>
+<li>Usa Dapper para conectarte a la base de datos y extraer las consultas y respuestas.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">//POCO para el mapeo</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Questions</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> required <span style="color:#66d9ef">int</span> IdConsulta { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> required <span style="color:#66d9ef">string</span> Consulta { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> required <span style="color:#66d9ef">int</span> Articulo { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> required <span style="color:#66d9ef">string</span> Texto { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">await</span> <span style="color:#66d9ef">using</span> var db = <span style="color:#66d9ef">new</span> SqliteConnection(<span style="color:#e6db74">$&#34;Data Source=dataset.db&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> questions = db.Query&lt;Questions&gt;(<span style="color:#e6db74">&#34;SELECT * FROM converted&#34;</span>);
+</span></span></code></pre></div><h2 id="paso-4-generación-de-embeddings">Paso 4: Generación de Embeddings</h2>
+<p>Los embeddings convierten texto en representaciones numéricas que permiten comparar similitudes semánticas entre diferentes textos.</p>
+<h3 id="obtener-embeddings-con-openai">Obtener Embeddings con OpenAI</h3>
+<p>Utiliza el modelo <code>text-embedding-3-small</code> de OpenAI para generar embeddings de nuestras consultas y respuestas.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span>EmbeddingClient embeddingClient = <span style="color:#66d9ef">new</span> EmbeddingClient(<span style="color:#e6db74">&#34;text-embedding-3-small&#34;</span>, Environment.GetEnvironmentVariable(<span style="color:#e6db74">&#34;OPENAI_API_KEY&#34;</span>));
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> question <span style="color:#66d9ef">in</span> questions)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">string</span> qAndA = <span style="color:#e6db74">$&#34;{question.Consulta}\n{question.Texto}&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> response = <span style="color:#66d9ef">await</span> embeddingClient.GenerateEmbeddingAsync(qAndA);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (response <span style="color:#66d9ef">is</span> not <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> floatMemory = response.Value.ToFloats();
+</span></span><span style="display:flex;"><span>        index.Add((<span style="color:#66d9ef">ulong</span>)question.IdConsulta, floatMemory.ToArray());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="paso-5-creación-de-la-base-de-datos-vectorial">Paso 5: Creación de la Base de Datos Vectorial</h2>
+<p>Con los embeddings generados, crearemos una base de datos vectorial que nos permitirá buscar respuestas relevantes basadas en la similitud semántica.</p>
+<h3 id="configurar-unum-usearch">Configurar Unum Usearch</h3>
+<ol>
+<li>Inicializa un índice vectorial con la dimensión correcta (por ejemplo, 1536 para el modelo <code>text-embedding-3-small</code>).</li>
+<li>Agrega los embeddings al índice junto con sus identificadores.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span> <span style="color:#66d9ef">var</span> index = <span style="color:#66d9ef">new</span> USearchIndex(
+</span></span><span style="display:flex;"><span>     metricKind: MetricKind.Cos,
+</span></span><span style="display:flex;"><span>     quantization: ScalarKind.Float32,
+</span></span><span style="display:flex;"><span>     dimensions: <span style="color:#ae81ff">1536</span>,  <span style="color:#75715e">// Dimension de vector de embeddings de OpenAI</span>
+</span></span><span style="display:flex;"><span>     connectivity: <span style="color:#ae81ff">16</span>, 
+</span></span><span style="display:flex;"><span>     expansionAdd: <span style="color:#ae81ff">128</span>,
+</span></span><span style="display:flex;"><span>     expansionSearch: <span style="color:#ae81ff">64</span> 
+</span></span><span style="display:flex;"><span> );
+</span></span><span style="display:flex;"><span> <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> question <span style="color:#66d9ef">in</span> questions)
+</span></span><span style="display:flex;"><span> {
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">string</span> qAndA = <span style="color:#e6db74">$&#34;{question.Consulta}\n{question.Texto}&#34;</span>;
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">var</span> response = <span style="color:#66d9ef">await</span> embeddingClient.GenerateEmbeddingAsync(qAndA);
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">if</span> (response <span style="color:#66d9ef">is</span> not <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>     {
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">var</span> floatMemory = response.Value.ToFloats();
+</span></span><span style="display:flex;"><span>         index.Add((<span style="color:#66d9ef">ulong</span>)question.IdConsulta, floatMemory.ToArray());
+</span></span><span style="display:flex;"><span>     }
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span> index.Save(<span style="color:#e6db74">&#34;dataset.vdb&#34;</span>);
+</span></span></code></pre></div><h2 id="paso-6-implementación-del-chatbot">Paso 6: Implementación del Chatbot</h2>
+<p>Ahora que tenemos nuestra base de datos vectorial, podemos comenzar a construir el chatbot.</p>
+<h3 id="flujo-del-chatbot">Flujo del Chatbot</h3>
+<ol>
+<li><strong>Entrada del Usuario</strong>: El usuario hace una pregunta.</li>
+<li><strong>Generación del Embedding de la Pregunta</strong>: Convertimos la pregunta del usuario en un embedding.</li>
+<li><strong>Búsqueda en la Base de Datos Vectorial</strong>: Encontramos las respuestas más relevantes basadas en la similitud de embeddings.</li>
+<li><strong>Construcción del Prompt</strong>: Creamos un prompt que incluye las respuestas relevantes y la pregunta del usuario.</li>
+<li><strong>Generación de la Respuesta</strong>: Usamos el modelo de lenguaje de OpenAI para generar la respuesta final.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span> <span style="color:#66d9ef">string?</span> line = Console.ReadLine(); <span style="color:#75715e">//Entrada del Usuario</span>
+</span></span><span style="display:flex;"><span> <span style="color:#66d9ef">if</span> (line <span style="color:#66d9ef">is</span> not <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span> {
+</span></span><span style="display:flex;"><span>     <span style="color:#75715e">//Generación del Embedding de la Pregunta</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">var</span> response = <span style="color:#66d9ef">await</span> embeddingClient.GenerateEmbeddingAsync(line);
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">if</span> (response <span style="color:#66d9ef">is</span> not <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>     {
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">var</span> floats = response.Value.ToFloats().ToArray();
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">int</span> maxResponses = <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span>         <span style="color:#75715e">//Búsqueda en la Base de Datos Vectorial</span>
+</span></span><span style="display:flex;"><span>         index.Search(floats, maxResponses, <span style="color:#66d9ef">out</span> <span style="color:#66d9ef">var</span> keys, <span style="color:#66d9ef">out</span> <span style="color:#66d9ef">var</span> distances);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">var</span> sbPrompt = <span style="color:#66d9ef">new</span> StringBuilder();
+</span></span><span style="display:flex;"><span>         sbPrompt.AppendLine(<span style="color:#e6db74">$&#34;Con las siguientes preguntas y respuestas:&#34;</span>);
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>; i &lt; maxResponses; i++)
+</span></span><span style="display:flex;"><span>         {
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">int</span> idConsulta = (<span style="color:#66d9ef">int</span>)keys[i];
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">var</span> question = questions.FirstOrDefault(q =&gt; q.IdConsulta == idConsulta);
+</span></span><span style="display:flex;"><span>             <span style="color:#75715e">//Construcción del Prompt</span>
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">if</span> (question <span style="color:#66d9ef">is</span> not <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>             {
+</span></span><span style="display:flex;"><span>                 sbPrompt.AppendLine(<span style="color:#e6db74">$&#34;Pregunta: {question.Consulta}&#34;</span>);
+</span></span><span style="display:flex;"><span>                 sbPrompt.AppendLine(<span style="color:#e6db74">$&#34;Respuesta:\n {question.Texto}&#34;</span>);
+</span></span><span style="display:flex;"><span>                 sbPrompt.AppendLine();
+</span></span><span style="display:flex;"><span>             }
+</span></span><span style="display:flex;"><span>         }
+</span></span><span style="display:flex;"><span>         <span style="color:#75715e">//Agrega la pregunta inicial al prompt</span>
+</span></span><span style="display:flex;"><span>         sbPrompt.AppendLine(<span style="color:#e6db74">$&#34;Response la siguiente pregunta: {line}&#34;</span>);
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">string</span> prompt = sbPrompt.ToString();
+</span></span><span style="display:flex;"><span>         
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>         <span style="color:#75715e">//Generación de la Respuesta</span>
+</span></span><span style="display:flex;"><span>         ChatMessage[] chatMessages = [<span style="color:#66d9ef">new</span> UserChatMessage(prompt )];
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> aiResponse <span style="color:#66d9ef">in</span> client.CompleteChatStreamingAsync(chatMessages))
+</span></span><span style="display:flex;"><span>         {
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">if</span> (aiResponse.ContentUpdate.Count &gt; <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>             {
+</span></span><span style="display:flex;"><span>                 Console.Write(aiResponse.ContentUpdate[<span style="color:#ae81ff">0</span>].Text);
+</span></span><span style="display:flex;"><span>             }
+</span></span><span style="display:flex;"><span>         }
+</span></span><span style="display:flex;"><span>     }
+</span></span><span style="display:flex;"><span> }
+</span></span></code></pre></div><h3 id="system-prompt">System Prompt</h3>
+<p>Para mejorar la interacción, podemos implementar un system prompt que modifique la manera en la que el Bot interactúa con el usuario, por ejemplo:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span>        <span style="color:#75715e">//system prompt used to define behavior for introduction and answers</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">string</span> system = <span style="color:#e6db74">&#34;Eres una bot de soporte tecnico que responde solo con la informacion que se mande en tu contexto y para cualquier duda que tu tengas darle la informacion de contacto al cliente: contact@cosme.com.mx numero telefonico: 445577&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//we stream the initial introduction</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> aiResponse <span style="color:#66d9ef">in</span> client.CompleteChatStreamingAsync(
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">                           [new UserChatMessage(&#34;Presentate ante el cliente de soporte tecnico, trabajas en universidad de Cosme Zamudio.&#34;), new SystemChatMessage(system)]</span>))
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (aiResponse.ContentUpdate.Count &gt; <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                Console.Write(aiResponse.ContentUpdate[<span style="color:#ae81ff">0</span>].Text);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span></code></pre></div><h2 id="conclusión">Conclusión</h2>
+<p>Hemos creado un chatbot funcional utilizando las APIs más recientes de OpenAI y una base de datos vectorial para manejar el conocimiento. Aunque este es un enfoque básico, puede ser expandido y mejorado para crear soluciones más robustas y escalables.</p>
+<h2 id="recursos">Recursos</h2>
+<ul>
+<li><a href="https://github.com/cosmez/ChatBotExample">Codigo Fuente Completo</a></li>
+<li><a href="">Video Original</a></li>
+<li><a href="https://beta.openai.com/docs/">Documentación de OpenAI</a></li>
+<li><a href="https://unum-cloud.github.io/usearch/csharp/index.html">Unum USearch</a></li>
+</ul>
+<h2 id="preguntas-frecuentes">Preguntas Frecuentes</h2>
+<p><strong>¿Puedo usar otros modelos de OpenAI?</strong></p>
+<p>Sí, puedes experimentar con diferentes modelos como <code>gpt-3.5-turbo</code> o <code>GPT-4o</code> para obtener diferentes resultados en las respuestas.</p>
+<p><strong>¿Es necesario usar una base de datos vectorial?</strong></p>
+<p>Para mejorar la relevancia y precisión de las respuestas, es recomendable. Sin embargo, para datasets muy pequeños, podrías manejar las comparaciones directamente en memoria.</p>
+<p><strong>¿Cómo puedo actualizar la base de conocimientos?</strong></p>
+<p>Deberás agregar las nuevas consultas y respuestas al dataset, generar los embeddings correspondientes y actualizar el índice vectorial.</p>
+
+</content>
+<p>
+  
+  <a href="http://localhost:1313/tags/csharp/">#Csharp</a>
+  
+  <a href="http://localhost:1313/tags/usearch/">#Usearch</a>
+  
+  <a href="http://localhost:1313/tags/openai/">#Openai</a>
+  
+  <a href="http://localhost:1313/tags/llm/">#Llm</a>
+  
+  <a href="http://localhost:1313/tags/ai/">#Ai</a>
+  
+  <a href="http://localhost:1313/tags/programacion/">#Programacion</a>
+  
+</p>
+
+  </main>
+  <footer><a href="https://github.com/janraasch/hugo-bearblog/">ʕ•ᴥ•ʔ</a>
+</footer>
+
+    
+</body>
+
+</html>
