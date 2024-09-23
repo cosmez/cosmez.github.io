@@ -2,45 +2,45 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>λ Cosme Zamudio</title>
-    <link>https://cosme.com.mx/</link>
+    <link>/</link>
     <description>Recent content on λ Cosme Zamudio</description>
     <generator>Hugo</generator>
     <language>es-MX</language>
     <lastBuildDate>Sun, 22 Sep 2024 16:40:06 -0700</lastBuildDate>
-    <atom:link href="https://cosme.com.mx/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Proyectos</title>
-      <link>https://cosme.com.mx/projects/</link>
+      <link>/projects/</link>
       <pubDate>Sun, 22 Sep 2024 16:40:06 -0700</pubDate>
-      <guid>https://cosme.com.mx/projects/</guid>
+      <guid>/projects/</guid>
       <description>&lt;p&gt;Proyectos&lt;/p&gt;</description>
     </item>
     <item>
       <title>Links</title>
-      <link>https://cosme.com.mx/links/</link>
+      <link>/links/</link>
       <pubDate>Sun, 22 Sep 2024 16:38:24 -0700</pubDate>
-      <guid>https://cosme.com.mx/links/</guid>
+      <guid>/links/</guid>
       <description>&lt;p&gt;Links&lt;/p&gt;</description>
     </item>
     <item>
       <title>Cómo Crear un Chatbot con C#, Unum USearch y OpenAI</title>
-      <link>https://cosme.com.mx/blog/como-crear-chatbot-csharp-usearch-openai/</link>
+      <link>/blog/como-crear-chatbot-csharp-usearch-openai/</link>
       <pubDate>Sun, 22 Sep 2024 15:55:14 -0700</pubDate>
-      <guid>https://cosme.com.mx/blog/como-crear-chatbot-csharp-usearch-openai/</guid>
+      <guid>/blog/como-crear-chatbot-csharp-usearch-openai/</guid>
       <description>&lt;h2 id=&#34;cómo-crear-un-chatbot-con-c-unum-usearch-y-openai&#34;&gt;Cómo Crear un Chatbot con C#, Unum USearch y OpenAI&lt;/h2&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;Este tutorial está basado en una transcripción de un video generada con el modelo whisper y ChatGPT o1-preview &lt;a href=&#34;https://www.youtube.com/watch?v=GGt_x7Lekp8&#34;&gt;Video Completo&lt;/a&gt;&#xA;&lt;a href=&#34;https://github.com/cosmez/ChatBotExample&#34;&gt;Codigo Completo&lt;/a&gt;&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;Una de las solicitudes más comunes de los clientes interesados en trabajar con inteligencia artificial es desarrollar un chatbot que pueda responder en lenguaje natural. En este artículo, exploraremos cómo implementar un chatbot utilizando las librerías proporcionadas por OpenAI y una pequeña base de datos vectorial llama USearch. Este enfoque no es el único, pero es una forma efectiva de abordar el problema.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Nuevo Blog</title>
-      <link>https://cosme.com.mx/blog/nuevo-blog/</link>
+      <link>/blog/nuevo-blog/</link>
       <pubDate>Sun, 22 Sep 2024 15:52:57 -0700</pubDate>
-      <guid>https://cosme.com.mx/blog/nuevo-blog/</guid>
+      <guid>/blog/nuevo-blog/</guid>
       <description>&lt;blockquote&gt;&#xA;&lt;p&gt;Basado en una recreación de un texto similar generado por ChatGPT o1-preview.&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;¡Hola a todos!&lt;/p&gt;&#xA;&lt;p&gt;Estoy emocionado de presentarles mi nuevo blog, un espacio donde fusionaré mi pasión por la programación con el fascinante mundo de la inteligencia artificial. Mi meta con este proyecto es convertir este sitio en un experimento de generación de contenido a través de IA, siempre basándome en contenido original y auténtico.&lt;/p&gt;&#xA;&lt;h2 id=&#34;qué-puedes-esperar&#34;&gt;¿Qué Puedes Esperar?&lt;/h2&gt;&#xA;&lt;h3 id=&#34;experimentación-de-nuevas-ideas-y-retos&#34;&gt;Experimentación de Nuevas Ideas y Retos&lt;/h3&gt;&#xA;&lt;p&gt;Aquí encontrarás una variedad de proyectos y desafíos que abordaré utilizando técnicas de programación innovadoras. Mi objetivo es explorar nuevas fronteras y compartir ese viaje contigo.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Intro</title>
-      <link>https://cosme.com.mx/posts/intro/</link>
+      <link>/posts/intro/</link>
       <pubDate>Sun, 22 Sep 2024 15:46:35 -0700</pubDate>
-      <guid>https://cosme.com.mx/posts/intro/</guid>
+      <guid>/posts/intro/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;This is &lt;strong&gt;bold&lt;/strong&gt; text, and this is &lt;em&gt;emphasized&lt;/em&gt; text.&lt;/p&gt;&#xA;&lt;p&gt;Visit the &lt;a href=&#34;https://gohugo.io&#34;&gt;Hugo&lt;/a&gt; website!&lt;/p&gt;</description>
     </item>
   </channel>

@@ -2,51 +2,51 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://cosme.com.mx/</loc>
+    <loc>/</loc>
     <lastmod>2024-09-22T16:40:06-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/projects/</loc>
+    <loc>/projects/</loc>
     <lastmod>2024-09-22T16:40:06-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/links/</loc>
+    <loc>/links/</loc>
     <lastmod>2024-09-22T16:38:24-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/tags/ai/</loc>
+    <loc>/tags/ai/</loc>
     <lastmod>2024-09-22T15:55:14-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/blog/</loc>
+    <loc>/blog/</loc>
     <lastmod>2024-09-22T15:55:14-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/blog/como-crear-chatbot-csharp-usearch-openai/</loc>
+    <loc>/blog/como-crear-chatbot-csharp-usearch-openai/</loc>
     <lastmod>2024-09-22T15:55:14-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/tags/csharp/</loc>
+    <loc>/tags/csharp/</loc>
     <lastmod>2024-09-22T15:55:14-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/tags/llm/</loc>
+    <loc>/tags/llm/</loc>
     <lastmod>2024-09-22T15:55:14-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/tags/openai/</loc>
+    <loc>/tags/openai/</loc>
     <lastmod>2024-09-22T15:55:14-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/tags/programacion/</loc>
+    <loc>/tags/programacion/</loc>
     <lastmod>2024-09-22T15:55:14-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/tags/</loc>
+    <loc>/tags/</loc>
     <lastmod>2024-09-22T15:55:14-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/tags/usearch/</loc>
+    <loc>/tags/usearch/</loc>
     <lastmod>2024-09-22T15:55:14-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/blog/nuevo-blog/</loc>
+    <loc>/blog/nuevo-blog/</loc>
     <lastmod>2024-09-22T15:52:57-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/posts/intro/</loc>
+    <loc>/posts/intro/</loc>
     <lastmod>2024-09-22T15:46:35-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/posts/</loc>
+    <loc>/posts/</loc>
     <lastmod>2024-09-22T15:46:35-07:00</lastmod>
   </url><url>
-    <loc>https://cosme.com.mx/categories/</loc>
+    <loc>/categories/</loc>
   </url>
 </urlset>
