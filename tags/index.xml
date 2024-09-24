@@ -6,20 +6,34 @@
     <description>Recent content in Tags on λ Cosme Zamudio</description>
     <generator>Hugo</generator>
     <language>es-MX</language>
-    <lastBuildDate>Sun, 22 Sep 2024 15:55:14 -0700</lastBuildDate>
+    <lastBuildDate>Mon, 23 Sep 2024 22:25:38 -0700</lastBuildDate>
     <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Csharp</title>
+      <link>/tags/csharp/</link>
+      <pubDate>Mon, 23 Sep 2024 22:25:38 -0700</pubDate>
+      <guid>/tags/csharp/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Programacion</title>
+      <link>/tags/programacion/</link>
+      <pubDate>Mon, 23 Sep 2024 22:25:38 -0700</pubDate>
+      <guid>/tags/programacion/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Stack</title>
+      <link>/tags/stack/</link>
+      <pubDate>Mon, 23 Sep 2024 22:25:38 -0700</pubDate>
+      <guid>/tags/stack/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Ai</title>
       <link>/tags/ai/</link>
       <pubDate>Sun, 22 Sep 2024 15:55:14 -0700</pubDate>
       <guid>/tags/ai/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Csharp</title>
-      <link>/tags/csharp/</link>
-      <pubDate>Sun, 22 Sep 2024 15:55:14 -0700</pubDate>
-      <guid>/tags/csharp/</guid>
       <description></description>
     </item>
     <item>
@@ -34,13 +48,6 @@
       <link>/tags/openai/</link>
       <pubDate>Sun, 22 Sep 2024 15:55:14 -0700</pubDate>
       <guid>/tags/openai/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Programacion</title>
-      <link>/tags/programacion/</link>
-      <pubDate>Sun, 22 Sep 2024 15:55:14 -0700</pubDate>
-      <guid>/tags/programacion/</guid>
       <description></description>
     </item>
     <item>
