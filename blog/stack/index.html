@@ -7,7 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>El Stack | λ Cosme Zamudio</title>
 <meta name="title" content="El Stack" />
-<meta name="description" content="Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones &ldquo;Value&rdquo; de algunas APIs, como por ejemplo:
+<meta name="description" content="
+Este artículo surgió gracias a mis experimentos con stack machines en C#.
+
+Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones &ldquo;Value&rdquo; de algunas APIs, como por ejemplo:
 
 Task y ValueTask
 Tuple y ValueTuple
@@ -20,7 +23,8 @@ Estos nuevos tipos son de valor y no de referencia, como si representaran un sig
 <meta property="og:url" content="/blog/stack/">
   <meta property="og:site_name" content="λ Cosme Zamudio">
   <meta property="og:title" content="El Stack">
-  <meta property="og:description" content="Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones “Value” de algunas APIs, como por ejemplo:
+  <meta property="og:description" content=" Este artículo surgió gracias a mis experimentos con stack machines en C#.
+Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones “Value” de algunas APIs, como por ejemplo:
 Task y ValueTask Tuple y ValueTuple Memory&lt;T&gt; y Span&lt;T&gt; Estos nuevos tipos son de valor y no de referencia, como si representaran un significado especial para el programador. Se explica que un tipo por referencia como Tuple se guarda en el Heap (Memoria), y un tipo por valor como ValueTuple se guarda en el Call Stack, ¿Pero qué ventajas tiene el Stack sobre el Heap ?">
   <meta property="og:locale" content="es_MX">
   <meta property="og:type" content="article">
@@ -36,18 +40,20 @@ Task y ValueTask Tuple y ValueTuple Memory&lt;T&gt; y Span&lt;T&gt; Estos nuevos
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="El Stack">
-  <meta name="twitter:description" content="Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones “Value” de algunas APIs, como por ejemplo:
+  <meta name="twitter:description" content=" Este artículo surgió gracias a mis experimentos con stack machines en C#.
+Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones “Value” de algunas APIs, como por ejemplo:
 Task y ValueTask Tuple y ValueTuple Memory&lt;T&gt; y Span&lt;T&gt; Estos nuevos tipos son de valor y no de referencia, como si representaran un significado especial para el programador. Se explica que un tipo por referencia como Tuple se guarda en el Heap (Memoria), y un tipo por valor como ValueTuple se guarda en el Call Stack, ¿Pero qué ventajas tiene el Stack sobre el Heap ?">
 
 
 
 
   <meta itemprop="name" content="El Stack">
-  <meta itemprop="description" content="Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones “Value” de algunas APIs, como por ejemplo:
+  <meta itemprop="description" content=" Este artículo surgió gracias a mis experimentos con stack machines en C#.
+Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones “Value” de algunas APIs, como por ejemplo:
 Task y ValueTask Tuple y ValueTuple Memory&lt;T&gt; y Span&lt;T&gt; Estos nuevos tipos son de valor y no de referencia, como si representaran un significado especial para el programador. Se explica que un tipo por referencia como Tuple se guarda en el Heap (Memoria), y un tipo por valor como ValueTuple se guarda en el Call Stack, ¿Pero qué ventajas tiene el Stack sobre el Heap ?">
   <meta itemprop="datePublished" content="2024-09-23T22:25:38-07:00">
   <meta itemprop="dateModified" content="2024-09-23T22:25:38-07:00">
-  <meta itemprop="wordCount" content="1216">
+  <meta itemprop="wordCount" content="1228">
   <meta itemprop="keywords" content="Csharp,Stack,Programacion">
 <meta name="referrer" content="no-referrer-when-downgrade" />
 
@@ -254,7 +260,10 @@ Task y ValueTask Tuple y ValueTuple Memory&lt;T&gt; y Span&lt;T&gt; Estos nuevos
 </p>
 
 <content>
-  <p>Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones &ldquo;Value&rdquo; de algunas APIs, como por ejemplo:</p>
+  <blockquote>
+<p>Este artículo surgió gracias a mis experimentos con <a href="https://github.com/cosmez/stack_machine">stack machines</a> en C#.</p>
+</blockquote>
+<p>Mejorar el rendimiento y el consumo de memoria es una de las tendencias que vemos en las nuevas versiones de C# (y .NET en general). Desde C# 7.0 se han introducido versiones &ldquo;Value&rdquo; de algunas APIs, como por ejemplo:</p>
 <ul>
 <li><code>Task</code> y <code>ValueTask</code></li>
 <li><code>Tuple</code> y <code>ValueTuple</code></li>
@@ -351,7 +360,7 @@ el trabajo de un GC es liberar los valores creados en el Heap que ya no están e
 <p>El tiempo en el que el GC se ejecuta, no es gratuito. En este momento la aplicación se debe de detener y dedicarle tiempo al GC para liberar memoria, Hay casos en los que un GC puede ser más rápido que el manejo de memoria manual pero por lo regular este no es el caso.</p>
 <p>Concluyendo con el Heap,  si sabemos que la vida de la variable acaba cuando la función sale, entonces lo más eficiente es meterlo al Stack. Si no, entonces al Heap. El GC es un tema muy complicado que me gustaria tocar mas a fondo en otro artículo.</p>
 <h3 id="temas-a-futuro">Temas a Futuro</h3>
-<p>.NET tiene algunas peculiaridades en el manejo de memoria, que me gustaria abordar en otro articulo.</p>
+<p>.NET tiene algunas peculiaridades en el manejo de memoria que me gustaria abordar en otro articulo.</p>
 <ul>
 <li>Se puede pasar un tipo de valor por referencia, pero solo hacia adelante</li>
 <li>Struct son por valor, Clases por Referencia. pero existen clases por referencia.</li>
