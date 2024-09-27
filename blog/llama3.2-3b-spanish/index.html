@@ -55,7 +55,7 @@ Introducción Hasta ahora, todos los modelos de lenguaje pequeño que he intenta
 La última versión antes de esta fue Llama 3.1, que salió hace aproximadamente dos meses. Esta versión 3.1 solo tenía modelos medianos y grandes, siendo el modelo más pequeño de aproximadamente 8 o 9 billones de parámetros. Este modelo apenas podía correr en mi tarjeta de video, una GTX 1080 Ti, que es algo viejita, pero tiene buena capacidad de procesamiento. Al utilizar la versión que tenía, requería alrededor de 8 gigabytes de memoria de video, pero no era óptima para las funciones que utilizamos para generar extracciones.">
   <meta itemprop="datePublished" content="2024-09-26T22:14:18-07:00">
   <meta itemprop="dateModified" content="2024-09-26T22:14:18-07:00">
-  <meta itemprop="wordCount" content="2000">
+  <meta itemprop="wordCount" content="2244">
   <meta itemprop="keywords" content="Ai,Csharp,Llm,Openai,Programacion,Llama,Llama3.2">
 <meta name="referrer" content="no-referrer-when-downgrade" />
 
@@ -411,9 +411,68 @@ Hasta ahora hemos concluido que &#34;somos&#34; no satisface las reglas para ser
 </span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;required&#34;</span>: [<span style="color:#e6db74">&#34;conceptos&#34;</span>]
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;);
-</span></span></span></code></pre></div><h2 id="lectura-de-pdfs">Lectura de PDFs</h2>
+</span></span></span></code></pre></div><h2 id="codigo">Codigo</h2>
 <p>Para la lectura de PDFs voy a usar la librería de <a href="https://github.com/Dtronix/PDFiumCore">PdfiumCore</a>. Estoy pensando en escribir un artículo sobre cómo usar esta librería en distintos lenguajes y contar por qué es la más eficiente que he encontrado para trabajar con PDFs. Se puede extraer texto de PDFs a una tasa sorprendente.</p>
-<h2 id="resultados">Resultados</h2>
+<p>El código para generar un prompt por cada página sería:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">//debemos sacar codigo unsafe de codigo asincrono</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">string</span> GetString(FpdfTextpageT pageTextT)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsafe</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//agarramos el numero de caracteres</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> characterCount = FPDFTextCountChars(pageTextT); 
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//cada caracteres 2 bytes + null al final (c string)</span>
+</span></span><span style="display:flex;"><span>        Span&lt;<span style="color:#66d9ef">byte</span>&gt; txt = <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span>[characterCount * <span style="color:#ae81ff">2</span> + <span style="color:#ae81ff">1</span>]; 
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">fixed</span> (<span style="color:#66d9ef">byte</span>* txtPtr = txt)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">//public/fpdf_text.h</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">//pasamos puntero a CLR fixed byte[]</span>
+</span></span><span style="display:flex;"><span>            FPDFTextGetText(pageTextT, <span style="color:#ae81ff">0</span>, characterCount, <span style="color:#66d9ef">ref</span> *(<span style="color:#66d9ef">ushort</span>*)txtPtr); 
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//convertimos a unicode</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> Encoding.Unicode.GetString(txt); 
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FPDF_InitLibrary(); <span style="color:#75715e">//inicializa Pdfium</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> filename <span style="color:#66d9ef">in</span> Directory.EnumerateFiles(folder, <span style="color:#e6db74">&#34;*.pdf&#34;</span>, SearchOption.AllDirectories))
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (!filename.Contains(<span style="color:#e6db74">&#34;CONCEPTOS&#34;</span>, StringComparison.OrdinalIgnoreCase)) <span style="color:#66d9ef">continue</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> documenT = FPDF_LoadDocument(filename, <span style="color:#66d9ef">null</span>); <span style="color:#75715e">//abrir documento</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> pageCount = FPDF_GetPageCount(documenT);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>; i &lt; pageCount; i++)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> pageT = FPDF_LoadPage(documenT, i); <span style="color:#75715e">//abrir pagina</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> pageTextT = FPDFTextLoadPage(pageT); <span style="color:#75715e">//abrir texto</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">string</span> pageText = GetString(pageTextT);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (pageText.Length &gt; <span style="color:#ae81ff">200</span>)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">//prompt para la extraccion</span>
+</span></span><span style="display:flex;"><span>            ChatMessage[] chatMessages = [
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">new</span> SystemChatMessage(<span style="color:#e6db74">&#34;Eres un bot de extraccion de datos de catalogos de conceptos, responde solo con json valido.&#34;</span>),
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">new</span> UserChatMessage(<span style="color:#e6db74">$@&#34;Con los siguientes datos de un catalogo de conceptos \n```\n{pageText}\n```\n 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                    Extrae una lista de conceptos con un arreglo de clave y descripcion con el formato de json: {{conceptos: [{{clave: &#34;&#34;Clave del concepto&#34;&#34;, descripcion: &#34;&#34;Descripcion del concepto&#34;&#34;}}]}}.&#34;</span>)
+</span></span><span style="display:flex;"><span>            ];
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> options = <span style="color:#66d9ef">new</span> ChatCompletionOptions() { Tools = { tool } };
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> response = <span style="color:#66d9ef">await</span> aiService.CompleteAsync(chatMessages, options);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">var</span> parsed = JsonSerializer.Deserialize&lt;Concepto&gt;(response);
+</span></span><span style="display:flex;"><span>                Console.WriteLine(<span style="color:#e6db74">$&#34;Parsed Correctly&#34;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">catch</span>
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                Console.WriteLine(<span style="color:#e6db74">$&#34;Failed to parse Json&#34;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        FPDFTextClosePage(pageTextT); <span style="color:#75715e">//liberar pagina</span>
+</span></span><span style="display:flex;"><span>        FPDF_ClosePage(pageT); <span style="color:#75715e">//liberar texto</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    FPDF_CloseDocument(documenT); <span style="color:#75715e">//liberar documento</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>FPDF_DestroyLibrary();
+</span></span></code></pre></div><h2 id="resultados">Resultados</h2>
 <p>En mis pruebas, he encontrado que algunos modelos simplemente no funcionan como se esperaba. Por ejemplo, al utilizar este modelo, la respuesta fue completamente inadecuada.</p>
 <p>Llama 3.2 me respondía con estructuras de tool, pero no respetaban la estructura que esperaba. Quería ver si podíamos utilizar esto para que, por ejemplo, un usuario definiera una extracción con los datos que él espera, y nosotros simplemente llamarlo y esperar que nos regresara los datos correctos. En este caso, ya nos dimos cuenta de que, por ejemplo, OpenAI no se ha equivocado ninguna vez, a pesar de que es un modelo pequeño y muy económico.</p>
 <p>En otros casos cuando el modelo agarra el tool, no me responde con los conceptos que realmente necesito. En su lugar, recibo un esquema completo que incluye parámetros, conceptos y descripciones, pero pueden ser cadenas vacias o nulas.</p>
