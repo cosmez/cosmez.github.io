@@ -55,7 +55,7 @@ Introducción Hasta ahora, todos los modelos de lenguaje pequeño que he intenta
 La última versión antes de esta fue Llama 3.1, que salió hace aproximadamente dos meses. Esta versión 3.1 solo tenía modelos medianos y grandes, siendo el modelo más pequeño de aproximadamente 8 o 9 billones de parámetros. Este modelo apenas podía correr en mi tarjeta de video, una GTX 1080 Ti, que es algo viejita, pero tiene buena capacidad de procesamiento. Al utilizar la versión que tenía, requería alrededor de 8 gigabytes de memoria de video, pero no era óptima para las funciones que utilizamos para generar extracciones.">
   <meta itemprop="datePublished" content="2024-09-26T22:14:18-07:00">
   <meta itemprop="dateModified" content="2024-09-26T22:14:18-07:00">
-  <meta itemprop="wordCount" content="2244">
+  <meta itemprop="wordCount" content="2245">
   <meta itemprop="keywords" content="Ai,Csharp,Llm,Openai,Programacion,Llama,Llama3.2">
 <meta name="referrer" content="no-referrer-when-downgrade" />
 
@@ -412,7 +412,7 @@ Hasta ahora hemos concluido que &#34;somos&#34; no satisface las reglas para ser
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;);
 </span></span></span></code></pre></div><h2 id="codigo">Codigo</h2>
-<p>Para la lectura de PDFs voy a usar la librería de <a href="https://github.com/Dtronix/PDFiumCore">PdfiumCore</a>. Estoy pensando en escribir un artículo sobre cómo usar esta librería en distintos lenguajes y contar por qué es la más eficiente que he encontrado para trabajar con PDFs. Se puede extraer texto de PDFs a una tasa sorprendente.</p>
+<p>Para la lectura de PDFs voy a usar la librería de <a href="https://github.com/Dtronix/PDFiumCore">PdfiumCore</a>. Estoy pensando en escribir un artículo sobre cómo usar esta librería en distintos lenguajes y contar por qué es la libreria más eficiente que he encontrado para trabajar con PDFs. Se puede extraer texto de PDFs a una tasa sorprendente.</p>
 <p>El código para generar un prompt por cada página sería:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">//debemos sacar codigo unsafe de codigo asincrono</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">string</span> GetString(FpdfTextpageT pageTextT)
