@@ -6,8 +6,15 @@
     <description>Recent content in Openai on λ Cosme Zamudio</description>
     <generator>Hugo</generator>
     <language>es-MX</language>
-    <lastBuildDate>Sun, 22 Sep 2024 15:55:14 -0700</lastBuildDate>
+    <lastBuildDate>Thu, 26 Sep 2024 22:14:18 -0700</lastBuildDate>
     <atom:link href="/tags/openai/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Llama3.2 3b Español</title>
+      <link>/blog/llama3.2-3b-spanish/</link>
+      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
+      <guid>/blog/llama3.2-3b-spanish/</guid>
+      <description>&lt;figure&gt;&lt;img src=&#34;/images/mexican-llama.webp&#34; width=&#34;400&#34;&gt;&#xA;&lt;/figure&gt;&#xA;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://github.com/cosmez/Llama3.2Tests&#34;&gt;Codigo Fuente Completo del Articulo&lt;/a&gt;&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;h2 id=&#34;introducción&#34;&gt;Introducción&lt;/h2&gt;&#xA;&lt;p&gt;Hasta ahora, todos los modelos de lenguaje pequeño que he intentado utilizar tienen el problema de no ser muy efectivos en español. Si bien pueden ser útiles para herramientas o para realizar cadenas de pensamiento y diferentes formas de prompts, si no responden adecuadamente en español, no tiene sentido usarlos localmente.&lt;/p&gt;&#xA;&lt;p&gt;La última versión antes de esta fue &lt;a href=&#34;https://ai.meta.com/blog/meta-llama-3-1/&#34;&gt;Llama 3.1&lt;/a&gt;, que salió hace aproximadamente dos meses. Esta versión 3.1 solo tenía modelos medianos y grandes, siendo el modelo más pequeño de aproximadamente 8 o 9 billones de parámetros. Este modelo apenas podía correr en mi tarjeta de video, una GTX 1080 Ti, que es algo viejita, pero tiene buena capacidad de procesamiento. Al utilizar la versión que tenía, requería alrededor de 8 gigabytes de memoria de video, pero no era óptima para las funciones que utilizamos para generar extracciones.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Cómo Crear un Chatbot con C#, Unum USearch y OpenAI</title>
       <link>/blog/como-crear-chatbot-csharp-usearch-openai/</link>

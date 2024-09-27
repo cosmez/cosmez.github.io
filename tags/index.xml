@@ -6,19 +6,54 @@
     <description>Recent content in Tags on λ Cosme Zamudio</description>
     <generator>Hugo</generator>
     <language>es-MX</language>
-    <lastBuildDate>Mon, 23 Sep 2024 22:25:38 -0700</lastBuildDate>
+    <lastBuildDate>Thu, 26 Sep 2024 22:14:18 -0700</lastBuildDate>
     <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ai</title>
+      <link>/tags/ai/</link>
+      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
+      <guid>/tags/ai/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Csharp</title>
       <link>/tags/csharp/</link>
-      <pubDate>Mon, 23 Sep 2024 22:25:38 -0700</pubDate>
+      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
       <guid>/tags/csharp/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Llama</title>
+      <link>/tags/llama/</link>
+      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
+      <guid>/tags/llama/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Llama3.2</title>
+      <link>/tags/llama3.2/</link>
+      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
+      <guid>/tags/llama3.2/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Llm</title>
+      <link>/tags/llm/</link>
+      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
+      <guid>/tags/llm/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Openai</title>
+      <link>/tags/openai/</link>
+      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
+      <guid>/tags/openai/</guid>
       <description></description>
     </item>
     <item>
       <title>Programacion</title>
       <link>/tags/programacion/</link>
-      <pubDate>Mon, 23 Sep 2024 22:25:38 -0700</pubDate>
+      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
       <guid>/tags/programacion/</guid>
       <description></description>
     </item>
@@ -27,27 +62,6 @@
       <link>/tags/stack/</link>
       <pubDate>Mon, 23 Sep 2024 22:25:38 -0700</pubDate>
       <guid>/tags/stack/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Ai</title>
-      <link>/tags/ai/</link>
-      <pubDate>Sun, 22 Sep 2024 15:55:14 -0700</pubDate>
-      <guid>/tags/ai/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Llm</title>
-      <link>/tags/llm/</link>
-      <pubDate>Sun, 22 Sep 2024 15:55:14 -0700</pubDate>
-      <guid>/tags/llm/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Openai</title>
-      <link>/tags/openai/</link>
-      <pubDate>Sun, 22 Sep 2024 15:55:14 -0700</pubDate>
-      <guid>/tags/openai/</guid>
       <description></description>
     </item>
     <item>
