@@ -6,13 +6,48 @@
     <description>Recent content in Tags on λ Cosme Zamudio</description>
     <generator>Hugo</generator>
     <language>es-MX</language>
-    <lastBuildDate>Thu, 26 Sep 2024 22:14:18 -0700</lastBuildDate>
+    <lastBuildDate>Sat, 09 Nov 2024 16:17:11 -0700</lastBuildDate>
     <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Ai</title>
       <link>/tags/ai/</link>
-      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
+      <pubDate>Sat, 09 Nov 2024 16:17:11 -0700</pubDate>
       <guid>/tags/ai/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Llm</title>
+      <link>/tags/llm/</link>
+      <pubDate>Sat, 09 Nov 2024 16:17:11 -0700</pubDate>
+      <guid>/tags/llm/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Tokenformer</title>
+      <link>/tags/tokenformer/</link>
+      <pubDate>Sat, 09 Nov 2024 16:17:11 -0700</pubDate>
+      <guid>/tags/tokenformer/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Transformer</title>
+      <link>/tags/transformer/</link>
+      <pubDate>Sat, 09 Nov 2024 16:17:11 -0700</pubDate>
+      <guid>/tags/transformer/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Datasets</title>
+      <link>/tags/datasets/</link>
+      <pubDate>Sat, 09 Nov 2024 16:12:48 -0700</pubDate>
+      <guid>/tags/datasets/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Agents</title>
+      <link>/tags/agents/</link>
+      <pubDate>Sat, 09 Nov 2024 16:10:32 -0700</pubDate>
+      <guid>/tags/agents/</guid>
       <description></description>
     </item>
     <item>
@@ -34,13 +69,6 @@
       <link>/tags/llama3.2/</link>
       <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
       <guid>/tags/llama3.2/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Llm</title>
-      <link>/tags/llm/</link>
-      <pubDate>Thu, 26 Sep 2024 22:14:18 -0700</pubDate>
-      <guid>/tags/llm/</guid>
       <description></description>
     </item>
     <item>

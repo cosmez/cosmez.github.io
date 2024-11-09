@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Datasets en Español. | λ Cosme Zamudio</title>
+<meta name="title" content="Datasets en Español." />
+<meta name="description" content="Datasets en Español
+He tenido la oportunidad de trabajar con inteligencia artificial en México y he detectado una necesidad: La falta de datasets abiertos en español para entrenar modelos de lenguaje y deep learning.
+Esta situación limita el desarrollo de la tecnología en México, pues las herramientas de IA existentes se basan principalmente en datos en inglés.
+Ejemplo: Paddle OCR
+
+Si actualmente están buscando la forma más eficiente de realizar OCR utilizando inteligencia artificial, una de las mejores opciones disponibles es PaddleOCR. PaddleOCR es un toolkit de OCR basado en la librería PaddlePaddle de Baidu." />
+<meta name="keywords" content="datasets,ai," />
+
+
+<meta property="og:url" content="/blog/datasets-abiertos/">
+  <meta property="og:site_name" content="λ Cosme Zamudio">
+  <meta property="og:title" content="Datasets en Español.">
+  <meta property="og:description" content="Datasets en Español He tenido la oportunidad de trabajar con inteligencia artificial en México y he detectado una necesidad: La falta de datasets abiertos en español para entrenar modelos de lenguaje y deep learning.
+Esta situación limita el desarrollo de la tecnología en México, pues las herramientas de IA existentes se basan principalmente en datos en inglés.
+Ejemplo: Paddle OCR Si actualmente están buscando la forma más eficiente de realizar OCR utilizando inteligencia artificial, una de las mejores opciones disponibles es PaddleOCR. PaddleOCR es un toolkit de OCR basado en la librería PaddlePaddle de Baidu.">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2024-11-09T16:12:48-07:00">
+    <meta property="article:modified_time" content="2024-11-09T16:12:48-07:00">
+    <meta property="article:tag" content="Datasets">
+    <meta property="article:tag" content="Ai">
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Datasets en Español.">
+  <meta name="twitter:description" content="Datasets en Español He tenido la oportunidad de trabajar con inteligencia artificial en México y he detectado una necesidad: La falta de datasets abiertos en español para entrenar modelos de lenguaje y deep learning.
+Esta situación limita el desarrollo de la tecnología en México, pues las herramientas de IA existentes se basan principalmente en datos en inglés.
+Ejemplo: Paddle OCR Si actualmente están buscando la forma más eficiente de realizar OCR utilizando inteligencia artificial, una de las mejores opciones disponibles es PaddleOCR. PaddleOCR es un toolkit de OCR basado en la librería PaddlePaddle de Baidu.">
+
+
+
+
+  <meta itemprop="name" content="Datasets en Español.">
+  <meta itemprop="description" content="Datasets en Español He tenido la oportunidad de trabajar con inteligencia artificial en México y he detectado una necesidad: La falta de datasets abiertos en español para entrenar modelos de lenguaje y deep learning.
+Esta situación limita el desarrollo de la tecnología en México, pues las herramientas de IA existentes se basan principalmente en datos en inglés.
+Ejemplo: Paddle OCR Si actualmente están buscando la forma más eficiente de realizar OCR utilizando inteligencia artificial, una de las mejores opciones disponibles es PaddleOCR. PaddleOCR es un toolkit de OCR basado en la librería PaddlePaddle de Baidu.">
+  <meta itemprop="datePublished" content="2024-11-09T16:12:48-07:00">
+  <meta itemprop="dateModified" content="2024-11-09T16:12:48-07:00">
+  <meta itemprop="wordCount" content="555">
+  <meta itemprop="keywords" content="Datasets,Ai">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: #fff;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+     
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #f2f2f2;
+  }
+
+  pre code {
+    color: #222;
+    display: block;
+    padding: 20px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    overflow-x: auto;
+  }
+
+  div.highlight pre {
+    background-color: initial;
+    color: initial;
+  }
+
+  div.highlight code {
+    background-color: unset;
+    color: unset;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #222;
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: #8b6fcb;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #333;
+      color: #ddd;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    strong,
+    b {
+      color: #eee;
+    }
+
+    a {
+      color: #8cc2dd;
+    }
+
+    code {
+      background-color: #777;
+    }
+
+    pre code {
+      color: #ddd;
+    }
+
+    blockquote {
+      color: #ccc;
+    }
+
+    textarea,
+    input {
+      background-color: #252525;
+      color: #ddd;
+    }
+
+    .helptext {
+      color: #aaa;
+    }
+  }
+
+</style>
+
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>λ Cosme Zamudio</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/links/">Links</a>
+
+<a href="/projects/">Proyectos</a>
+
+
+<a href="/blog">Blog</a>
+
+</nav>
+</header>
+  <main>
+
+<h1>Datasets en Español.</h1>
+<p>
+  <i>
+    <time datetime='2024-11-09' pubdate>
+      09 Nov, 2024
+    </time>
+  </i>
+</p>
+
+<content>
+  <h2 id="datasets-en-español">Datasets en Español</h2>
+<p>He tenido la oportunidad de trabajar con inteligencia artificial en México y he detectado una necesidad: La falta de datasets abiertos en español para entrenar modelos de lenguaje y deep learning.</p>
+<p>Esta situación limita el desarrollo de la tecnología en México, pues las herramientas de IA existentes se basan principalmente en datos en inglés.</p>
+<h3 id="ejemplo-paddle-ocr">Ejemplo: Paddle OCR</h3>
+<p><img src="https://github.com/PaddlePaddle/PaddleOCR/releases/download/v2.8.0/PaddleOCR_logo.png" alt="PaddleOCR"></p>
+<p>Si actualmente están buscando la forma más eficiente de realizar OCR utilizando inteligencia artificial, una de las mejores opciones disponibles es <a href="https://github.com/PaddlePaddle/PaddleOCR">PaddleOCR</a>. PaddleOCR es un toolkit de OCR basado en la librería PaddlePaddle de Baidu.</p>
+<p>El último intento que hice con PaddleOCR fue añadir texto a unos PDFs, que son de todos los libros de la SEP, recopilados en el siguiente repositorio:</p>
+<p><a href="https://github.com/incognia/CONALITEG">https://github.com/incognia/CONALITEG</a></p>
+<p><img src="https://github.com/incognia/CONALITEG/blob/main/Primaria/JPG/01/P1MLA/000.jpg?raw=true" alt="000.jpg"></p>
+<p>Para eso escribí un <a href="https://github.com/cosmez/CONALITEG/blob/ocr/ocr.py">pequeño script en python</a> usando MuPDF y PaddleOCR para reconstruir el texto y agregarlo al PDF original. Con la manera recomendada de usar la librería, cuando le pides que descargue los pesos del lenguaje español, PaddleOCR descarga la version multilenguaje de su modelo.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>paddle <span style="color:#f92672">=</span> PaddleOCR(use_angle_cls<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, lang<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;es&#34;</span>)
+</span></span></code></pre></div><p>Los modelos bases en chino e inglés pesan alrededor de 13-20MB. los modelos con soporte multilenguaje están arriba de los 150MB. Si estás pensando incluir PaddleOCR como una dependencia de tu aplicación, debes de considerar que debes de incluir 150MB mínimo como dependencia o entrenar tu propia version ultra lightweight de PaddleOCR.</p>
+<p>Aqui es donde surge el problema, aunque yo tuviera la capacidad técnica de hacer el entrenado del modelo, con que datasets cuento ahora para entrenar un modelo de este tipo?</p>
+<p>Lo mismo aplica para la nueva oleada de modelos de lenguaje pequeños (&lt; 10b parámetros). son modelos de lenguaje que son especializados en ciertas tareas (resumen, tool call, etc.) pero tienen muchos problemas para trabajar en español, recientemente probe Gwen 2.5, Llama 3.2 3b y algunos otros y todos tienen muchos problemas al intentar seguir instrucciones en español.</p>
+<p><img src="https://i.ytimg.com/vi/avXkpM6XZuc/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&amp;rs=AOn4CLCrE-75_KkeavqBQ_Mw1aqVQ84hxg" alt="Llama 3.2 is Beating OpenAI at Their Own Game (Real-Time AI Voice,  Vision&hellip;)"></p>
+<p>Si existiera un dataset de tool calling en español, se podría entrenar un modelo especializado en entender llamadas a tools en español.</p>
+<p>Es por esto que quiero iniciar un nuevo proyecto para la comunidad de habla hispana, que por ahora le llamare: <strong>&ldquo;Datasets en Español&rdquo;</strong>.</p>
+<p>El objetivo de la iniciativa es recopilar, limpiar y organizar datos abiertos en español para que sean accesibles a la comunidad tecnológica, facilitando la creación de modelos de IA.</p>
+<h3 id="el-proyecto-se-divide-en-las-siguientes-etapas">El proyecto se divide en las siguientes etapas:</h3>
+<ol>
+<li>
+<p><strong>Identificar fuentes:</strong> Encontrar plataformas y fuentes de información pública en español.</p>
+</li>
+<li>
+<p><strong>Análisis legal:</strong> Verificar la legalidad del uso de los datos y la posibilidad de recopilar información sin infringir derechos de autor.</p>
+</li>
+<li>
+<p><strong>Recopilación y limpieza:</strong> Utilizar plataformas de crowdsourcing y crear un <a href="https://github.com/sindresorhus/awesome">awesome list</a> para recopilar datos de forma colaborativa.</p>
+</li>
+<li>
+<p><strong>Notebooks:</strong> Desarrollar notebooks que muestren ejemplos de cómo utilizar los datasets abiertos para entrenar modelos de IA.</p>
+</li>
+<li>
+<p><strong>Modelos propios:</strong> Fomentar la creación de modelos de IA en español utilizando los datasets recopilados en el proyecto.</p>
+</li>
+</ol>
+<p>Como meta personal, pienso que alcanzar el tercer punto es suficiente. Si logro encontrar quien me apoye, entonces el siguiente paso sería crear notebooks y modelos personalizados.</p>
+<h3 id="invitación-a-la-comunidad">Invitación a la comunidad:</h3>
+<p>Voy a crear un repositorio en <a href="https://github.com/cosmez/awesome-datasets-espanol">GitHub</a> y una colleccion en <a href="https://huggingface.co/collections/cosmez/datasets-espanol-67295e55bd72eea313f3a353">Hugging Face</a> para empezar el proyecto, si de alguna manera deseas ayudar, en los próximos días voy a subir una actualización a este articulo y me puedes mandar un correo a <a href="mailto:contacto@cosme.com.mx">contacto@cosme.com.mx</a></p>
+
+</content>
+<p>
+  
+  <a href="/tags/datasets/">#Datasets</a>
+  
+  <a href="/tags/ai/">#Ai</a>
+  
+</p>
+
+  </main>
+  <footer><a href="https://github.com/janraasch/hugo-bearblog/">ʕ•ᴥ•ʔ</a>
+</footer>
+
+    
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Datasets on λ Cosme Zamudio</title>
+    <link>/tags/datasets/</link>
+    <description>Recent content in Datasets on λ Cosme Zamudio</description>
+    <generator>Hugo</generator>
+    <language>es-MX</language>
+    <lastBuildDate>Sat, 09 Nov 2024 16:12:48 -0700</lastBuildDate>
+    <atom:link href="/tags/datasets/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Datasets en Español.</title>
+      <link>/blog/datasets-abiertos/</link>
+      <pubDate>Sat, 09 Nov 2024 16:12:48 -0700</pubDate>
+      <guid>/blog/datasets-abiertos/</guid>
+      <description>&lt;h2 id=&#34;datasets-en-español&#34;&gt;Datasets en Español&lt;/h2&gt;&#xA;&lt;p&gt;He tenido la oportunidad de trabajar con inteligencia artificial en México y he detectado una necesidad: La falta de datasets abiertos en español para entrenar modelos de lenguaje y deep learning.&lt;/p&gt;&#xA;&lt;p&gt;Esta situación limita el desarrollo de la tecnología en México, pues las herramientas de IA existentes se basan principalmente en datos en inglés.&lt;/p&gt;&#xA;&lt;h3 id=&#34;ejemplo-paddle-ocr&#34;&gt;Ejemplo: Paddle OCR&lt;/h3&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://github.com/PaddlePaddle/PaddleOCR/releases/download/v2.8.0/PaddleOCR_logo.png&#34; alt=&#34;PaddleOCR&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Si actualmente están buscando la forma más eficiente de realizar OCR utilizando inteligencia artificial, una de las mejores opciones disponibles es &lt;a href=&#34;https://github.com/PaddlePaddle/PaddleOCR&#34;&gt;PaddleOCR&lt;/a&gt;. PaddleOCR es un toolkit de OCR basado en la librería PaddlePaddle de Baidu.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

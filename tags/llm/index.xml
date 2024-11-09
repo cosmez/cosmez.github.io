@@ -6,8 +6,22 @@
     <description>Recent content in Llm on λ Cosme Zamudio</description>
     <generator>Hugo</generator>
     <language>es-MX</language>
-    <lastBuildDate>Thu, 26 Sep 2024 22:14:18 -0700</lastBuildDate>
+    <lastBuildDate>Sat, 09 Nov 2024 16:17:11 -0700</lastBuildDate>
     <atom:link href="/tags/llm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tokenformer</title>
+      <link>/blog/tokenformer/</link>
+      <pubDate>Sat, 09 Nov 2024 16:17:11 -0700</pubDate>
+      <guid>/blog/tokenformer/</guid>
+      <description>&lt;h2 id=&#34;tokenformer&#34;&gt;TokenFormer&lt;/h2&gt;&#xA;&lt;p&gt;La arquitectura Transformer han dominado la inteligencia artificial gracias a su capacidad para manejar datos y relaciones complejas. Sin embargo, enfrentan dos grandes desafíos: la capacidad de aprender en tiempo real y el alto costo energético de su entrenamiento. &lt;a href=&#34;https://arxiv.org/abs/2410.23168&#34;&gt;TokenFormer&lt;/a&gt; (wang2024tokenformer) es una nueva arquitectura diseñada para resolver estos problemas.&lt;/p&gt;&#xA;&lt;h3 id=&#34;neuroplasticidad-en-redes-neuronales&#34;&gt;Neuroplasticidad en Redes Neuronales&lt;/h3&gt;&#xA;&lt;p&gt;Uno de los mayores desafíos en la evolución de las redes neuronales es su limitada neuroplasticidad, es decir, la capacidad de integrar conocimiento nuevo sin perder lo ya aprendido. TokenFormer soluciona esto reutilizando parámetros previamente entrenados y añadiendo nuevos, lo que permite un aprendizaje progresivo sin necesidad de reentrenar desde cero.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>The Future of Ai Is Agentic</title>
+      <link>/blog/the-future-of-ai-is-agentic/</link>
+      <pubDate>Sat, 09 Nov 2024 16:10:32 -0700</pubDate>
+      <guid>/blog/the-future-of-ai-is-agentic/</guid>
+      <description>&lt;h2 id=&#34;the-future-of-ai-is-agentic&#34;&gt;The future of AI is agentic&lt;/h2&gt;&#xA;&lt;p&gt;Es la primera frase de un nuevo proyecto de Microsoft Research llamado &lt;strong&gt;&lt;a href=&#34;https://www.microsoft.com/en-us/research/articles/magentic-one-a-generalist-multi-agent-system-for-solving-complex-tasks/&#34;&gt;Magnetic-One&lt;/a&gt;&lt;/strong&gt;.  Magnetic-One es un orquestador de agentes.&lt;/p&gt;&#xA;&lt;p&gt;Hace unos días también se presentó una propuesta con una tesis llamada &lt;strong&gt;&lt;a href=&#34;https://agoraprotocol.org/&#34;&gt;Agora Protocol&lt;/a&gt;&lt;/strong&gt;, un protocolo multiplataforma, simple y diseñado para la comunicación eficiente entre agentes de modelos de lenguaje (LLM).&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://imgs.xkcd.com/comics/standards.png&#34; alt=&#34;standards&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Al igual que estos dos, hay varios frentes que se están enfocando en la &amp;ldquo;agentización&amp;rdquo; de los modelos de lenguaje. Microsoft, IBM, Google y otros han hablado en sus recientes keynotes o han lanzado proyectos para hacer esto posible.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Llama3.2 3b Español</title>
       <link>/blog/llama3.2-3b-spanish/</link>
