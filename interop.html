@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C# Interop & Low-Level | Cosme Zamudio</title>
+    <meta name="description" content="Expertise in C# interoperability, P/Invoke, custom bindings for C/C++ libraries, and low-level performance optimization.">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-wrapper">
+                <a href="/" class="brand"><span class="brand-symbol">λ</span> Cosme Zamudio</a>
+                <nav>
+                    <ul>
+                        <li><a href="/">Services</a></li>
+                        <li><a href="applications.html">Applications</a></li>
+                        <li><a href="pdf-knowledge.html">PDF Engineering</a></li>
+                        <li><a href="dicom-engineering.html">DICOM</a></li>
+                        <li><a href="interop.html" class="active">C# Interop</a></li>
+                        <li><a href="https://github.com/cosmez" target="_blank">GitHub</a></li>
+                        <li><a href="es/interop.html" class="lang-switch">ES</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h1>Low-Level C# & Native Interop</h1>
+                <p>Bridging the gap between managed .NET applications and high-performance native libraries. Unlocking hardware capabilities and legacy code.</p>
+            </section>
+
+            <section class="section">
+                <div class="content">
+                    <h2>Beyond the Managed Boundary</h2>
+                    <p>While .NET is powerful, some problems require dropping down to the metal. I specialize in building robust, memory-safe communication layers between C# and C/C++ libraries, enabling the use of industry-standard tools within modern .NET architectures.</p>
+
+                    <div class="grid" style="margin-top: 2rem;">
+                        <div class="card">
+                            <h3>Custom Native Bindings</h3>
+                            <p>Expertise in writing manual P/Invoke definitions, strict marshalling, and handling memory ownership. Creating high-fidelity wrappers for libraries like QPDF, PDFium, and LibHaru (as seen in my open source examples).</p>
+                        </div>
+                        <div class="card">
+                            <h3>Advanced Interop Strategies</h3>
+                            <p>Handling complex C++ types not supported by standard P/Invoke using C++/CLI bridges or custom "flattener" C layers. Integrating specialized hardware drivers and legacy DLLs.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Performance Optimization</h3>
+                            <p>Utilizing <code>Span&lt;T&gt;</code>, <code>Memory&lt;T&gt;</code>, and <code>unsafe</code> pointer arithmetic to eliminate copying when passing data across the managed/native boundary. Deep understanding of IL generation for critical hot paths.</p>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 3rem;">Recent Work in Interop</h3>
+                    <ul>
+                        <li><strong>Qpdf.Native:</strong> A raw binding to the QPDF library, exposing its powerful PDF manipulation capabilities to .NET.</li>
+                        <li><strong>PDFiumCore:</strong> Low-level access to Google's PDFium rendering engine.</li>
+                        <li><strong>LibHaruCore:</strong> A modern wrapper around the LibHaru PDF generation library.</li>
+                    </ul>
+
+                    <p class="cta-text" style="text-align: left; margin-top: 2rem;">Need to consume a C++ library in .NET or optimize a critical path? I can build the bridge. Email me at <a href="mailto:cosmez@gmail.com">cosmez@gmail.com</a>.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Cosme Zamudio. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

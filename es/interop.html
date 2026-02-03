@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C# Interop & Bajo Nivel | Cosme Zamudio</title>
+    <meta name="description" content="Experiencia en interoperabilidad C#, P/Invoke, bindings personalizados para librerías C/C++ y optimización de rendimiento a bajo nivel.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-wrapper">
+                <a href="index.html" class="brand"><span class="brand-symbol">λ</span> Cosme Zamudio</a>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Servicios</a></li>
+                        <li><a href="applications.html">Aplicaciones</a></li>
+                        <li><a href="pdf-knowledge.html">Ingeniería PDF</a></li>
+                        <li><a href="dicom-engineering.html">DICOM</a></li>
+                        <li><a href="interop.html" class="active">C# Interop</a></li>
+                        <li><a href="https://github.com/cosmez" target="_blank">GitHub</a></li>
+                        <li><a href="../interop.html" class="lang-switch">EN</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h1>C# de Bajo Nivel e Interop Nativo</h1>
+                <p>Cerrando la brecha entre aplicaciones .NET gestionadas y librerías nativas de alto rendimiento. Desbloqueando capacidades de hardware y código legacy.</p>
+            </section>
+
+            <section class="section">
+                <div class="content">
+                    <h2>Más Allá del Límite Gestionado</h2>
+                    <p>Aunque .NET es potente, algunos problemas requieren bajar al "metal". Me especializo en construir capas de comunicación robustas y seguras (memory-safe) entre C# y librerías C/C++, permitiendo el uso de herramientas estándar de la industria dentro de arquitecturas .NET modernas.</p>
+
+                    <div class="grid" style="margin-top: 2rem;">
+                        <div class="card">
+                            <h3>Bindings Nativos Personalizados</h3>
+                            <p>Experiencia en definiciones P/Invoke manuales, marshalling estricto y gestión de propiedad de memoria. Creación de wrappers de alta fidelidad para librerías como QPDF, PDFium y LibHaru (como se ve en mis ejemplos open source).</p>
+                        </div>
+                        <div class="card">
+                            <h3>Estrategias Avanzadas de Interop</h3>
+                            <p>Manejo de tipos C++ complejos no soportados por P/Invoke estándar usando puentes C++/CLI o capas "flattener" de C. Integración de drivers de hardware especializados y DLLs legacy.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Optimización de Rendimiento</h3>
+                            <p>Utilización de <code>Span&lt;T&gt;</code>, <code>Memory&lt;T&gt;</code> y aritmética de punteros <code>unsafe</code> para eliminar copias al pasar datos a través del límite gestionado/nativo. Entendimiento profundo de generación IL para rutas críticas.</p>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 3rem;">Trabajo Reciente en Interop</h3>
+                    <ul>
+                        <li><strong>Qpdf.Native:</strong> Un binding crudo a la librería QPDF, exponiendo sus potentes capacidades de manipulación de PDF a .NET.</li>
+                        <li><strong>PDFiumCore:</strong> Acceso de bajo nivel al motor de renderizado PDFium de Google.</li>
+                        <li><strong>LibHaruCore:</strong> Un wrapper moderno alrededor de la librería de generación PDF LibHaru.</li>
+                    </ul>
+
+                    <p class="cta-text" style="text-align: left; margin-top: 2rem;">¿Necesita consumir una librería C++ en .NET u optimizar una ruta crítica? Puedo construir el puente. Email: <a href="mailto:cosmez@gmail.com">cosmez@gmail.com</a>.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Cosme Zamudio. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+</body>
+</html>

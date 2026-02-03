@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosme Zamudio | Senior Software Architect & AI Engineer</title>
-    <meta name="description" content="Professional developer services by Cosme Zamudio. Specializing in .NET/C#, AI/LLM integration, PDF processing, and high-performance architecture.">
-    <link rel="stylesheet" href="css/style.css">
+    <title>Cosme Zamudio | Arquitecto de Software & Ingeniero IA</title>
+    <meta name="description" content="Servicios de desarrollo profesional por Cosme Zamudio. Especialista en .NET/C#, integración IA/LLM, procesamiento de PDF y arquitectura de alto rendimiento.">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
             <div class="nav-wrapper">
-                <a href="/" class="brand"><span class="brand-symbol">λ</span> Cosme Zamudio</a>
+                <a href="index.html" class="brand"><span class="brand-symbol">λ</span> Cosme Zamudio</a>
                 <nav>
                     <ul>
-                        <li><a href="/" class="active">Services</a></li>
-                        <li><a href="applications.html">Applications</a></li>
-                        <li><a href="pdf-knowledge.html">PDF Engineering</a></li>
+                        <li><a href="index.html" class="active">Servicios</a></li>
+                        <li><a href="applications.html">Aplicaciones</a></li>
+                        <li><a href="pdf-knowledge.html">Ingeniería PDF</a></li>
                         <li><a href="dicom-engineering.html">DICOM</a></li>
                         <li><a href="interop.html">C# Interop</a></li>
                         <li><a href="https://github.com/cosmez" target="_blank">GitHub</a></li>
-                        <li><a href="es/index.html" class="lang-switch">ES</a></li>
+                        <li><a href="../index.html" class="lang-switch">EN</a></li>
                     </ul>
                 </nav>
             </div>
@@ -28,52 +28,50 @@
 
         <main>
             <section class="hero">
-                <h1>Software Architect &<br>AI Solutions Engineer</h1>
-                <p>Over 20 years of experience building high-performance systems. From enterprise .NET architecture to cutting-edge AI agents and deep PDF processing tools.</p>
+                <h1>Arquitecto de Software &<br>Ingeniero en Soluciones IA</h1>
+                <p>Más de 20 años de experiencia construyendo sistemas de alto rendimiento. Desde arquitectura empresarial .NET hasta agentes de IA avanzados y herramientas profundas de procesamiento PDF.</p>
             </section>
 
             <section class="section">
                 <div class="section-title">
-                    <h2>Core Competencies</h2>
+                    <h2>Competencias Principales</h2>
                 </div>
                 <div class="grid">
                     <div class="card">
-                        <h3>.NET & Cloud Architecture</h3>
-                        <p>Specialized in modern C# ecosystems (ASP.NET, Blazor, SignalR) and cloud deployment (Azure, GCP). Focus on security, high concurrency, and native interoperability.</p>
+                        <h3>Arquitectura .NET y Nube</h3>
+                        <p>Especialización en ecosistemas modernos C# (ASP.NET, Blazor, SignalR) y despliegue en la nube (Azure, GCP). Enfoque en seguridad, alta concurrencia e interoperabilidad nativa.</p>
                     </div>
                     <div class="card">
-                        <h3>AI & NLP Integration</h3>
-                        <p>Building practical agentic workflows with LLMs, RAG solutions, vector search (USearch, RediSearch), and custom transformer pipelines.</p>
+                        <h3>Integración IA y NLP</h3>
+                        <p>Construcción de flujos de trabajo agénticos prácticos con LLMs, soluciones RAG, búsqueda vectorial (USearch, RediSearch) y pipelines personalizados de transformers.</p>
                     </div>
                     <div class="card">
-                        <h3>Deep PDF Processing</h3>
-                        <p>Low-level manipulation of PDF internals. Custom parsing, content extraction, and document generation engines beyond standard libraries.</p>
+                        <h3>Procesamiento Profundo de PDF</h3>
+                        <p>Manipulación de bajo nivel de los componentes internos de PDF. Motores de parsing, extracción de contenido y generación de documentos más allá de las librerías estándar.</p>
                     </div>
                     <div class="card">
-                        <h3>Data Engineering</h3>
-                        <p>Designing zero-dependency data pipelines, BI workflows, and real-time indexing systems for construction and medical sectors (DICOM/HL7).</p>
+                        <h3>Ingeniería de Datos</h3>
+                        <p>Diseño de pipelines de datos sin dependencias, flujos BI y sistemas de indexación en tiempo real para sectores de construcción y médico (DICOM/HL7).</p>
                     </div>
                 </div>
             </section>
 
             <section class="section" id="github-showcase">
                 <div class="section-title">
-                    <h2>Latest Output</h2>
+                    <h2>Actividad Reciente</h2>
                 </div>
                 <div class="grid" id="repo-grid">
-                    <!-- Repos loaded via JS -->
-                    <p>Loading projects...</p>
+                    <p>Cargando proyectos...</p>
                 </div>
             </section>
             
-            <p class="cta-text">Need help with complex architecture or AI integration? Reach out at <a href="mailto:cosmez@gmail.com">cosmez@gmail.com</a>.</p>
+            <p class="cta-text">¿Necesita ayuda con arquitectura compleja o integración de IA? Escríbame a <a href="mailto:cosmez@gmail.com">cosmez@gmail.com</a>.</p>
         </main>
-        
+
         <footer>
-            <p>&copy; 2026 Cosme Zamudio. All rights reserved.</p>
+            <p>&copy; 2026 Cosme Zamudio. Todos los derechos reservados.</p>
             <div class="social-links">
                 <a href="https://github.com/cosmez">GitHub</a>
-                <!-- Add LinkedIn or Email if available later -->
             </div>
         </footer>
     </div>
@@ -87,7 +85,6 @@
             const grid = document.getElementById('repo-grid');
 
             try {
-                // Fetch specific repos in parallel
                 const promises = specificRepos.map(name => 
                     fetch(`https://api.github.com/repos/cosmez/${name}`).then(res => res.ok ? res.json() : null)
                 );
@@ -95,21 +92,21 @@
                 const results = await Promise.all(promises);
                 const repos = results.filter(r => r !== null);
                 
-                grid.innerHTML = ''; // Clear loading
+                grid.innerHTML = ''; 
 
                 repos.forEach(repo => {
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.innerHTML = `
                         <h3><a href="${repo.html_url}" target="_blank">${repo.name}</a></h3>
-                        <p>${repo.description || 'No description available.'}</p>
+                        <p>${repo.description || 'Sin descripción disponible.'}</p>
                         <small>⭐ ${repo.stargazers_count} | ${repo.language || 'Code'}</small>
                     `;
                     grid.appendChild(card);
                 });
             } catch (e) {
                 console.error(e);
-                grid.innerHTML = '<p>Unable to load repositories at this time.</p>';
+                grid.innerHTML = '<p>No se pudieron cargar los repositorios en este momento.</p>';
             }
         }
         loadGithubRepos();
