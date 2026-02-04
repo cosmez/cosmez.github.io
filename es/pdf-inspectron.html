@@ -61,6 +61,29 @@
             font-size: 0.85rem;
             color: var(--text-secondary);
         }
+        .store-button {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            transition: opacity 0.2s;
+            border: 1px solid transparent;
+        }
+        .store-button:hover {
+            opacity: 0.9;
+            color: var(--bg-primary);
+        }
+        .store-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 0.6rem;
+            fill: currentColor;
+        }
     </style>
 </head>
 <body>
@@ -93,6 +116,12 @@
                 <span class="chip">Análisis PDF Bajo Nivel</span>
                 <span class="chip">Multiplataforma</span>
             </div>
+            <a href="https://apps.microsoft.com/detail/9nb9x2cfrhkq" target="_blank" class="store-button">
+                <svg class="store-icon" viewBox="0 0 24 24">
+                    <path d="M1 1h10v10H1V1zm11 0h11v10H12V1zM1 12h10v11H1V12zm11 0h11v11H12V12z"/>
+                </svg>
+                Obtener en Microsoft Store
+            </a>
         </div>
     </div>
 
