@@ -52,6 +52,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1.5rem;
 }
 
 .brand {
@@ -64,6 +65,7 @@ header {
     align-items: center;
     gap: 0.5rem;
     letter-spacing: -0.02em;
+    white-space: nowrap;
 }
 
 .brand-symbol {
@@ -75,21 +77,25 @@ header {
 nav ul {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
     align-items: center;
 }
 
 nav a {
+    display: inline-block;
     color: var(--text-secondary);
     font-weight: 500;
     font-size: 0.95rem;
+    white-space: nowrap;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
 }
 
 nav a:hover, nav a.active {
     color: var(--text-primary);
     background-color: var(--bg-secondary);
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
     text-decoration: none;
 }
 
@@ -221,8 +227,8 @@ footer {
     }
     
     nav ul {
-        flex-wrap: wrap;
-        gap: 1rem;
+        justify-content: flex-start;
+        gap: 0.25rem;
     }
     
     .hero h1 {
