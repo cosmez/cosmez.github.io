@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cómo Crear un Chatbot con C#, Unum USearch y OpenAI | Cosme Zamudio</title>
+    <meta name="description" content="Una de las solicitudes más comunes de los clientes interesados en trabajar con inteligencia artificial es desarrollar un chatbot que pueda responder en lenguaje natural. En este artículo, exploraremos cómo implementar un chatbot utilizando…">
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-wrapper">
+                <a href="/" class="brand"><span class="brand-symbol">λ</span> Cosme Zamudio</a>
+                <nav>
+                    <ul>
+                        <li><a href="../../es/index.html">Servicios</a></li>
+                        <li><a href="../../es/applications.html">Aplicaciones</a></li>
+                        <li><a href="../../es/pdf-knowledge.html">Ingeniería PDF</a></li>
+                        <li><a href="../../es/dicom-engineering.html">DICOM</a></li>
+                        <li><a href="../../es/interop.html">C# Interop</a></li>
+                        <li><a href="../../blog/index.html" class="active">Blog</a></li>
+                        <li><a href="https://github.com/cosmez" target="_blank">GitHub</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <article class="post">
+                <header class="post-header">
+                    <a href="../index.html" class="post-back">&larr; Blog</a>
+                    <h1>Cómo Crear un Chatbot con C#, Unum USearch y OpenAI</h1>
+                    <div class="post-meta">
+                        <time datetime="2024-09-22">22 de septiembre de 2024</time>
+                        <div class="tags"><span class="tag">csharp</span><span class="tag">usearch</span><span class="tag">openai</span><span class="tag">llm</span><span class="tag">ai</span><span class="tag">programacion</span></div>
+                    </div>
+                </header>
+                <div class="post-content">
+<blockquote>
+<p>Este tutorial está basado en una transcripción de un video generada con el modelo whisper y ChatGPT o1-preview <a href="https://www.youtube.com/watch?v=GGt_x7Lekp8">Video Completo</a>
+<a href="https://github.com/cosmez/ChatBotExample">Codigo Completo</a></p>
+</blockquote>
+<p>Una de las solicitudes más comunes de los clientes interesados en trabajar con inteligencia artificial es desarrollar un chatbot que pueda responder en lenguaje natural. En este artículo, exploraremos cómo implementar un chatbot utilizando las librerías proporcionadas por OpenAI y una pequeña base de datos vectorial llama USearch. Este enfoque no es el único, pero es una forma efectiva de abordar el problema.</p>
+<h2>Introducción</h2>
+<p>El objetivo es crear un chatbot que pueda interactuar con los usuarios de manera natural, respondiendo a sus consultas basándose en una base de conocimientos predefinida. Utilizaremos <strong>.NET 8</strong> y crearemos una aplicación de consola sin interfaz gráfica.</p>
+<h2>Requisitos Previos</h2>
+<p>Para seguir este tutorial, necesitarás:</p>
+<ul>
+<li>Una <strong>cuenta de <a href="https://platform.openai.com/docs/overview">OpenAI</a></strong> para acceder a sus modelos y APIs.</li>
+<li><strong><a href="https://visualstudio.microsoft.com/vs/community/">Visual Studio</a></strong> con soporte para .NET 8.</li>
+<li>Conocimientos básicos de C# y .NET.</li>
+</ul>
+<h2>Paso 1: Configuración Inicial</h2>
+<h3>Crear la Aplicación de Consola</h3>
+<p>Comienza abriendo Visual Studio y crea una nueva aplicación de consola en <strong>.NET 8</strong>:</p>
+<ol>
+<li>Selecciona <strong>Archivo &gt; Nuevo &gt; Proyecto</strong>.</li>
+<li>Elige <strong>Aplicación de Consola (.NET)</strong>.</li>
+<li>Nombra el proyecto, por ejemplo, <code>ChatBotExample</code>.</li>
+</ol>
+<h3>Configurar las Variables de Entorno</h3>
+<p>Necesitas configurar tu clave de API de OpenAI como una variable de entorno:</p>
+<ol>
+<li>Ve a las variables de entorno de tu sistema.</li>
+<li>Crea una nueva variable llamada <code>OPENAI_API_KEY</code>.</li>
+<li>Establece su valor a tu clave de API de OpenAI.</li>
+</ol>
+<h2>Paso 2: Instalación de Librerías Necesarias</h2>
+<p>Para interactuar con OpenAI y manejar la base de datos vectorial, necesitamos instalar algunas librerías:</p>
+<h3>Librería de OpenAI</h3>
+<p>Instala la librería oficial de OpenAI para .NET (Prerelease):</p>
+<div class="highlight"><pre><span></span><code>dotnet<span class="w"> </span>add<span class="w"> </span>package<span class="w"> </span>OpenAI<span class="w"> </span>--prerelease
+</code></pre></div>
+
+<h3>Librería para la Base de Datos Vectorial</h3>
+<p>Usaremos <strong><a href="https://unum-cloud.github.io/usearch/csharp/index.html">Unum Usearch</a></strong> para manejar nuestra base de datos vectorial:</p>
+<div class="highlight"><pre><span></span><code>dotnet<span class="w"> </span>add<span class="w"> </span>package<span class="w"> </span>Cloud.Unum.USearch
+</code></pre></div>
+
+<h3>Otras Dependencias</h3>
+<p>También necesitaremos:</p>
+<ul>
+<li><strong>SQLite</strong> para manejar nuestra base de datos local.</li>
+<li><strong>Dapper</strong> para facilitar las operaciones con la base de datos.</li>
+</ul>
+<p>Instálalos usando:</p>
+<div class="highlight"><pre><span></span><code>dotnet<span class="w"> </span>add<span class="w"> </span>package<span class="w"> </span>Microsoft.Data.Sqlite
+dotnet<span class="w"> </span>add<span class="w"> </span>package<span class="w"> </span>Dapper
+</code></pre></div>
+
+<h2>Paso 3: Preparación de la Base de Conocimientos</h2>
+<p>Necesitamos un dataset que contiene consultas y respuestas relacionadas con una universidad. Para este ejemplo usaremos el dataset de <a href="https://huggingface.co/datasets/HuggMaxi/preguntasEtiquetadas">huggingface</a> convertido a <a href="https://github.com/cosmez/ChatBotExample/blob/master/ChatBot/dataset.db">SQLite</a></p>
+<h3>Cargar el Dataset</h3>
+<ol>
+<li>Coloca el archivo del dataset en una carpeta dentro de tu proyecto.</li>
+<li>Usa Dapper para conectarte a la base de datos y extraer las consultas y respuestas.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1">//POCO para el mapeo</span>
+<span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">Questions</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="n">required</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">IdConsulta</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="n">required</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="n">Consulta</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="n">required</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">Articulo</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="n">required</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="n">Texto</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">await</span><span class="w"> </span><span class="k">using</span><span class="w"> </span><span class="nn">var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SqliteConnection</span><span class="p">(</span><span class="s">$&quot;Data Source=dataset.db&quot;</span><span class="p">);</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">questions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">Query</span><span class="o">&lt;</span><span class="n">Questions</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;SELECT * FROM converted&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<h2>Paso 4: Generación de Embeddings</h2>
+<p>Los embeddings convierten texto en representaciones numéricas que permiten comparar similitudes semánticas entre diferentes textos.</p>
+<h3>Obtener Embeddings con OpenAI</h3>
+<p>Utiliza el modelo <code>text-embedding-3-small</code> de OpenAI para generar embeddings de nuestras consultas y respuestas.</p>
+<div class="highlight"><pre><span></span><code><span class="n">EmbeddingClient</span><span class="w"> </span><span class="n">embeddingClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">EmbeddingClient</span><span class="p">(</span><span class="s">&quot;text-embedding-3-small&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Environment</span><span class="p">.</span><span class="n">GetEnvironmentVariable</span><span class="p">(</span><span class="s">&quot;OPENAI_API_KEY&quot;</span><span class="p">));</span>
+<span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">question</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">questions</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">string</span><span class="w"> </span><span class="n">qAndA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">$&quot;{question.Consulta}\n{question.Texto}&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">embeddingClient</span><span class="p">.</span><span class="n">GenerateEmbeddingAsync</span><span class="p">(</span><span class="n">qAndA</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">response</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">floatMemory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">ToFloats</span><span class="p">();</span>
+<span class="w">        </span><span class="n">index</span><span class="p">.</span><span class="n">Add</span><span class="p">((</span><span class="kt">ulong</span><span class="p">)</span><span class="n">question</span><span class="p">.</span><span class="n">IdConsulta</span><span class="p">,</span><span class="w"> </span><span class="n">floatMemory</span><span class="p">.</span><span class="n">ToArray</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2>Paso 5: Creación de la Base de Datos Vectorial</h2>
+<p>Con los embeddings generados, crearemos una base de datos vectorial que nos permitirá buscar respuestas relevantes basadas en la similitud semántica.</p>
+<h3>Configurar Unum Usearch</h3>
+<ol>
+<li>Inicializa un índice vectorial con la dimensión correcta (por ejemplo, 1536 para el modelo <code>text-embedding-3-small</code>).</li>
+<li>Agrega los embeddings al índice junto con sus identificadores.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">USearchIndex</span><span class="p">(</span>
+<span class="w">     </span><span class="n">metricKind</span><span class="p">:</span><span class="w"> </span><span class="n">MetricKind</span><span class="p">.</span><span class="n">Cos</span><span class="p">,</span>
+<span class="w">     </span><span class="n">quantization</span><span class="p">:</span><span class="w"> </span><span class="n">ScalarKind</span><span class="p">.</span><span class="n">Float32</span><span class="p">,</span>
+<span class="w">     </span><span class="n">dimensions</span><span class="p">:</span><span class="w"> </span><span class="mi">1536</span><span class="p">,</span><span class="w">  </span><span class="c1">// Dimension de vector de embeddings de OpenAI</span>
+<span class="w">     </span><span class="n">connectivity</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span>
+<span class="w">     </span><span class="n">expansionAdd</span><span class="p">:</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span>
+<span class="w">     </span><span class="n">expansionSearch</span><span class="p">:</span><span class="w"> </span><span class="mi">64</span><span class="w"> </span>
+<span class="w"> </span><span class="p">);</span>
+<span class="w"> </span><span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">question</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">questions</span><span class="p">)</span>
+<span class="w"> </span><span class="p">{</span>
+<span class="w">     </span><span class="kt">string</span><span class="w"> </span><span class="n">qAndA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">$&quot;{question.Consulta}\n{question.Texto}&quot;</span><span class="p">;</span>
+<span class="w">     </span><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">embeddingClient</span><span class="p">.</span><span class="n">GenerateEmbeddingAsync</span><span class="p">(</span><span class="n">qAndA</span><span class="p">);</span>
+<span class="w">     </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">response</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">)</span>
+<span class="w">     </span><span class="p">{</span>
+<span class="w">         </span><span class="kt">var</span><span class="w"> </span><span class="n">floatMemory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">ToFloats</span><span class="p">();</span>
+<span class="w">         </span><span class="n">index</span><span class="p">.</span><span class="n">Add</span><span class="p">((</span><span class="kt">ulong</span><span class="p">)</span><span class="n">question</span><span class="p">.</span><span class="n">IdConsulta</span><span class="p">,</span><span class="w"> </span><span class="n">floatMemory</span><span class="p">.</span><span class="n">ToArray</span><span class="p">());</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w"> </span><span class="p">}</span>
+
+<span class="w"> </span><span class="n">index</span><span class="p">.</span><span class="n">Save</span><span class="p">(</span><span class="s">&quot;dataset.vdb&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<h2>Paso 6: Implementación del Chatbot</h2>
+<p>Ahora que tenemos nuestra base de datos vectorial, podemos comenzar a construir el chatbot.</p>
+<h3>Flujo del Chatbot</h3>
+<ol>
+<li><strong>Entrada del Usuario</strong>: El usuario hace una pregunta.</li>
+<li><strong>Generación del Embedding de la Pregunta</strong>: Convertimos la pregunta del usuario en un embedding.</li>
+<li><strong>Búsqueda en la Base de Datos Vectorial</strong>: Encontramos las respuestas más relevantes basadas en la similitud de embeddings.</li>
+<li><strong>Construcción del Prompt</strong>: Creamos un prompt que incluye las respuestas relevantes y la pregunta del usuario.</li>
+<li><strong>Generación de la Respuesta</strong>: Usamos el modelo de lenguaje de OpenAI para generar la respuesta final.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="w"> </span><span class="kt">string?</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Console</span><span class="p">.</span><span class="n">ReadLine</span><span class="p">();</span><span class="w"> </span><span class="c1">//Entrada del Usuario</span>
+<span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">line</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">)</span>
+<span class="w"> </span><span class="p">{</span>
+<span class="w">     </span><span class="c1">//Generación del Embedding de la Pregunta</span>
+<span class="w">     </span><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">embeddingClient</span><span class="p">.</span><span class="n">GenerateEmbeddingAsync</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
+<span class="w">     </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">response</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">)</span>
+<span class="w">     </span><span class="p">{</span>
+<span class="w">         </span><span class="kt">var</span><span class="w"> </span><span class="n">floats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">ToFloats</span><span class="p">().</span><span class="n">ToArray</span><span class="p">();</span>
+<span class="w">         </span><span class="kt">int</span><span class="w"> </span><span class="n">maxResponses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">         </span><span class="c1">//Búsqueda en la Base de Datos Vectorial</span>
+<span class="w">         </span><span class="n">index</span><span class="p">.</span><span class="n">Search</span><span class="p">(</span><span class="n">floats</span><span class="p">,</span><span class="w"> </span><span class="n">maxResponses</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">keys</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">distances</span><span class="p">);</span>
+
+<span class="w">         </span><span class="kt">var</span><span class="w"> </span><span class="n">sbPrompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span>
+<span class="w">         </span><span class="n">sbPrompt</span><span class="p">.</span><span class="n">AppendLine</span><span class="p">(</span><span class="s">$&quot;Con las siguientes preguntas y respuestas:&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">maxResponses</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">             </span><span class="kt">int</span><span class="w"> </span><span class="n">idConsulta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">             </span><span class="kt">var</span><span class="w"> </span><span class="n">question</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">questions</span><span class="p">.</span><span class="n">FirstOrDefault</span><span class="p">(</span><span class="n">q</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">.</span><span class="n">IdConsulta</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">idConsulta</span><span class="p">);</span>
+<span class="w">             </span><span class="c1">//Construcción del Prompt</span>
+<span class="w">             </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">question</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">)</span>
+<span class="w">             </span><span class="p">{</span>
+<span class="w">                 </span><span class="n">sbPrompt</span><span class="p">.</span><span class="n">AppendLine</span><span class="p">(</span><span class="s">$&quot;Pregunta: {question.Consulta}&quot;</span><span class="p">);</span>
+<span class="w">                 </span><span class="n">sbPrompt</span><span class="p">.</span><span class="n">AppendLine</span><span class="p">(</span><span class="s">$&quot;Respuesta:\n {question.Texto}&quot;</span><span class="p">);</span>
+<span class="w">                 </span><span class="n">sbPrompt</span><span class="p">.</span><span class="n">AppendLine</span><span class="p">();</span>
+<span class="w">             </span><span class="p">}</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">         </span><span class="c1">//Agrega la pregunta inicial al prompt</span>
+<span class="w">         </span><span class="n">sbPrompt</span><span class="p">.</span><span class="n">AppendLine</span><span class="p">(</span><span class="s">$&quot;Response la siguiente pregunta: {line}&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="kt">string</span><span class="w"> </span><span class="n">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sbPrompt</span><span class="p">.</span><span class="n">ToString</span><span class="p">();</span>
+
+
+<span class="w">         </span><span class="c1">//Generación de la Respuesta</span>
+<span class="w">         </span><span class="n">ChatMessage</span><span class="p">[]</span><span class="w"> </span><span class="n">chatMessages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="k">new</span><span class="w"> </span><span class="n">UserChatMessage</span><span class="p">(</span><span class="n">prompt</span><span class="w"> </span><span class="p">)];</span>
+<span class="w">         </span><span class="k">await</span><span class="w"> </span><span class="nf">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">aiResponse</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">CompleteChatStreamingAsync</span><span class="p">(</span><span class="n">chatMessages</span><span class="p">))</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">             </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">aiResponse</span><span class="p">.</span><span class="n">ContentUpdate</span><span class="p">.</span><span class="n">Count</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">             </span><span class="p">{</span>
+<span class="w">                 </span><span class="n">Console</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">aiResponse</span><span class="p">.</span><span class="n">ContentUpdate</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">Text</span><span class="p">);</span>
+<span class="w">             </span><span class="p">}</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<h3>System Prompt</h3>
+<p>Para mejorar la interacción, podemos implementar un system prompt que modifique la manera en la que el Bot interactúa con el usuario, por ejemplo:</p>
+<div class="highlight"><pre><span></span><code><span class="w">        </span><span class="c1">//system prompt used to define behavior for introduction and answers</span>
+<span class="w">        </span><span class="kt">string</span><span class="w"> </span><span class="n">system</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Eres una bot de soporte tecnico que responde solo con la informacion que se mande en tu contexto y para cualquier duda que tu tengas darle la informacion de contacto al cliente: contact@cosme.com.mx numero telefonico: 445577&quot;</span><span class="p">;</span>
+
+
+<span class="w">        </span><span class="c1">//we stream the initial introduction</span>
+<span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="nf">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">aiResponse</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">CompleteChatStreamingAsync</span><span class="p">(</span>
+<span class="w">                           </span><span class="na">[new UserChatMessage(&quot;Presentate ante el cliente de soporte tecnico, trabajas en universidad de Cosme Zamudio.&quot;), new SystemChatMessage(system)]</span><span class="p">))</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">aiResponse</span><span class="p">.</span><span class="n">ContentUpdate</span><span class="p">.</span><span class="n">Count</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="n">Console</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">aiResponse</span><span class="p">.</span><span class="n">ContentUpdate</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">Text</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+</code></pre></div>
+
+<h2>Conclusión</h2>
+<p>Hemos creado un chatbot funcional utilizando las APIs más recientes de OpenAI y una base de datos vectorial para manejar el conocimiento. Aunque este es un enfoque básico, puede ser expandido y mejorado para crear soluciones más robustas y escalables.</p>
+<h2>Recursos</h2>
+<ul>
+<li><a href="https://github.com/cosmez/ChatBotExample">Codigo Fuente Completo</a></li>
+<li><a href="https://www.youtube.com/watch?v=GGt_x7Lekp8">Video Original</a></li>
+<li><a href="https://beta.openai.com/docs/">Documentación de OpenAI</a></li>
+<li><a href="https://unum-cloud.github.io/usearch/csharp/index.html">Unum USearch</a></li>
+</ul>
+<h2>Preguntas Frecuentes</h2>
+<p><strong>¿Puedo usar otros modelos de OpenAI?</strong></p>
+<p>Sí, puedes experimentar con diferentes modelos como <code>gpt-3.5-turbo</code> o <code>GPT-4o</code> para obtener diferentes resultados en las respuestas.</p>
+<p><strong>¿Es necesario usar una base de datos vectorial?</strong></p>
+<p>Para mejorar la relevancia y precisión de las respuestas, es recomendable. Sin embargo, para datasets muy pequeños, podrías manejar las comparaciones directamente en memoria.</p>
+<p><strong>¿Cómo puedo actualizar la base de conocimientos?</strong></p>
+<p>Deberás agregar las nuevas consultas y respuestas al dataset, generar los embeddings correspondientes y actualizar el índice vectorial.</p>
+                </div>
+            </article>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Cosme Zamudio. Todos los derechos reservados.</p>
+            <div class="social-links">
+                <a href="https://github.com/cosmez">GitHub</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

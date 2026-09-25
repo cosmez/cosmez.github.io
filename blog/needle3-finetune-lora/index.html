@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-tuning de Needle 3 en Español con LoRA | Cosme Zamudio</title>
+    <meta name="description" content="Hace una semana Cactus publicó Needle 3, un modelo pequeño especializado en function calling y extracción estructurada. No es un modelo para platicar: le das una lista de herramientas y una petición en lenguaje natural, y te regresa qué…">
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-wrapper">
+                <a href="/" class="brand"><span class="brand-symbol">λ</span> Cosme Zamudio</a>
+                <nav>
+                    <ul>
+                        <li><a href="../../es/index.html">Servicios</a></li>
+                        <li><a href="../../es/applications.html">Aplicaciones</a></li>
+                        <li><a href="../../es/pdf-knowledge.html">Ingeniería PDF</a></li>
+                        <li><a href="../../es/dicom-engineering.html">DICOM</a></li>
+                        <li><a href="../../es/interop.html">C# Interop</a></li>
+                        <li><a href="../../blog/index.html" class="active">Blog</a></li>
+                        <li><a href="https://github.com/cosmez" target="_blank">GitHub</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <article class="post">
+                <header class="post-header">
+                    <a href="../index.html" class="post-back">&larr; Blog</a>
+                    <h1>Fine-tuning de Needle 3 en Español con LoRA</h1>
+                    <div class="post-meta">
+                        <time datetime="2026-09-25">25 de septiembre de 2026</time>
+                        <div class="tags"><span class="tag">ai</span><span class="tag">llm</span><span class="tag">needle</span><span class="tag">lora</span><span class="tag">finetuning</span><span class="tag">function-calling</span><span class="tag">programacion</span></div>
+                    </div>
+                </header>
+                <div class="post-content">
+<blockquote>
+<p>Este artículo está basado en un experimento local con Needle 3: datos sintéticos en inglés y español, entrenamiento LoRA en mi GTX 1080 Ti y evaluación corriendo el motor real del modelo.</p>
+</blockquote>
+<h2>Introducción</h2>
+<p>Hace una semana <a href="https://cactuscompute.com/needle">Cactus</a> publicó Needle 3, un modelo pequeño especializado en function calling y extracción estructurada. No es un modelo para platicar: le das una lista de herramientas y una petición en lenguaje natural, y te regresa qué función llamar y con qué argumentos. Va de 25 a 121 millones de parámetros, pesa entre 8 y 29 MB en su cuantización CQ2 (2.125 bits por peso) y corre en CPU con un motor en C de menos de 1 MB por plataforma.</p>
+<p>La arquitectura es lo que más me llamó la atención. Es una Simple Attention Network, o sea, no tiene el bloque FFN que tienen todos los transformers. El mezclado de canales lo hace un MLP tipo Monarch-Hadamard, y la memoria de hechos vive en un <em>engram</em>, que son tablas de n-gramas hasheados (70.8 millones de los 121 millones de parámetros del modelo de 20 capas). Además usan algo que llaman <em>intelligence laddering</em>: cada profundidad de 2 a 20 capas es un modelo que se puede desplegar por sí solo, porque durante el entrenamiento van muestreando profundidades y destilando hacia el modelo completo.</p>
+<p>Lo que promete Cactus es que con fine-tuning sobre <a href="https://aclanthology.org/2025.findings-emnlp.484/">DroidCall</a> el modelo sube entre 18 y 36 puntos en cada peldaño, y que desde 4 capas (29M) el modelo ajustado le gana a DeepSeek V4 Flash. Yo quería comprobar dos cosas:</p>
+<ol>
+<li>Si el fine-tuning local con LoRA, que es gratis, realmente mejora el modelo.</li>
+<li>Si funciona en español.</li>
+</ol>
+<p>La misma documentación ya anticipa problemas: la cabeza de confianza no se actualiza con un LoRA local, y en idiomas distintos al inglés la confianza no es confiable (reportan llamadas correctas en español con confianza 0.0).</p>
+<h2>El Problema: Falsos Positivos con Confianza Alta</h2>
+<p>Antes de entrenar nada, probé el modelo base con seis herramientas de domótica. Estas son respuestas reales del set de prueba en español:</p>
+<div class="highlight"><pre><span></span><code>&gt; &quot;dame una receta de pasta&quot;
+play_music(query=&quot;pasta&quot;)                    # confidence 1.0
+
+&gt; &quot;resúmeme este artículo&quot;
+play_music(query=&quot;resúmeme artículo&quot;)        # confidence 1.0
+
+&gt; &quot;baja el volumen de la radio&quot;
+control_lights(room=&quot;radio&quot;, state=&quot;on&quot;)     # confidence 1.0
+</code></pre></div>
+
+<p>Que se equivoque en algo que está fuera de sus herramientas es esperable. Lo que preocupa es que lo haga con confianza de 1.0. La idea de Needle es que uses la confianza para decidir si ejecutas la llamada, si le pides confirmación al usuario o si la rechazas, y si la confianza no está calibrada ese enrutado no sirve. En español el modelo base solo rechazó 2 de 12 peticiones fuera de tema; en inglés, 7 de 12.</p>
+<h2>El Experimento</h2>
+<p>La tarea es un asistente de casa con 6 herramientas: luces, termostato, puertas, alarma, mensajes y música.</p>
+<ul>
+<li><strong>Datos</strong>: 300 ejemplos de entrenamiento, 40 de validación y 120 de prueba por idioma. Las plantillas y los valores (habitaciones, puertas, nombres) no se repiten entre los splits, así que el modelo no puede memorizar el set de prueba. El 10% son peticiones que se deben rechazar (<code>answers: []</code>) y el 15% piden dos llamadas.</li>
+<li><strong>Generación</strong>: los datos los generó otro modelo y los validé con un script: que cumplan el esquema, que cada argumento aparezca en la petición y que no haya duplicados entre splits.</li>
+<li><strong>Métrica</strong>: exact match ordenado, es decir, mismo nombre de función, mismo orden y todos los argumentos iguales. También calculo dos variantes más permisivas: <code>loose</code>, que ignora argumentos opcionales que el modelo agrega sin que se los pidan, y <code>loose-ci</code>, que además compara sin distinguir mayúsculas.</li>
+<li><strong>Inferencia</strong>: todo corre en el motor real de Needle, con <code>reset()</code> entre cada petición. Sumo <code>function_calls</code> y <code>suppressed_calls</code> porque los modelos ajustados localmente no tienen cabeza de confianza.</li>
+</ul>
+<p>Cada línea del dataset se ve así:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;query&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;baja las luces de la terraza al 60&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;tools&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;answers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;control_lights&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;room&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;terraza&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;brightness&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">}}],</span><span class="w"> </span><span class="nt">&quot;reasoning&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&#39;terraza&#39; -&gt; room; &#39;al 60&#39; -&gt; brightness&quot;</span><span class="p">}</span>
+</code></pre></div>
+
+<h2>Entrenamiento</h2>
+<p>La configuración fue LoRA de rango 16 y alpha 32, sobre las proyecciones q/k/v/gate/out de las 20 capas. El modelo base queda congelado en float32 y el entrenamiento simula la cuantización W4 del export (STE). Batch de 16, learning rate de 1e-4 con warmup y cosine, 25 épocas (425 pasos) y 10% de los datos para validación.</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;cactus-needle[train]==3.0.4&quot;</span>
+needle<span class="w"> </span>finetune<span class="w"> </span>es_train.jsonl<span class="w"> </span>--epochs<span class="w"> </span><span class="m">25</span><span class="w"> </span>--out<span class="w"> </span>adapter_es.safetensors
+needle<span class="w"> </span>build<span class="w"> </span>--lora<span class="w"> </span>adapter_es.safetensors<span class="w"> </span>--out<span class="w"> </span>tuned_es_20l.cact
+needle<span class="w"> </span>build<span class="w"> </span>--lora<span class="w"> </span>adapter_es.safetensors<span class="w"> </span>--layers<span class="w"> </span><span class="m">8</span><span class="w"> </span>--out<span class="w"> </span>tuned_es_8l.cact
+</code></pre></div>
+
+<p>Aquí me encontré con el primer problema. Mi tarjeta de video sigue siendo la GTX 1080 Ti, que es arquitectura Pascal (sm_61), y JAX 0.11 ya no genera código para ella. Las operaciones básicas de JAX sí corren, pero el <code>train_step</code> truena al cargar. La solución fue crear otro entorno virtual con una versión anterior de JAX que todavía soporta sm_61:</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv-gpu
+.venv-gpu/bin/pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;cactus-needle[train]==3.0.4&quot;</span><span class="w"> </span><span class="s2">&quot;jax[cuda12]==0.4.38&quot;</span>
+</code></pre></div>
+
+<p>Con eso cada paso tarda como 2.5 segundos en la GPU, unos 18 minutos por idioma. En CPU también funciona, pero es alrededor de un minuto por paso, casi 7 horas por idioma.</p>
+<p>Para usar el modelo ajustado solo hay que pasarle el archivo:</p>
+<div class="highlight"><pre><span></span><code><span class="n">agent</span> <span class="o">=</span> <span class="n">needle</span><span class="o">.</span><span class="n">Needle</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;tuned_es_20l.cact&quot;</span><span class="p">)</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="s2">&quot;baja las luces del salón al 20&quot;</span><span class="p">)</span>
+<span class="c1"># confidence: None, el LoRA local no entrena la cabeza de confianza y needle build la descarta</span>
+</code></pre></div>
+
+<h2>Resultados</h2>
+<p>Exact match estricto sobre los 120 casos de prueba de cada idioma:</p>
+<table>
+<thead>
+<tr>
+<th>test</th>
+<th>base</th>
+<th>20 capas</th>
+<th>8 capas</th>
+<th>4 capas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inglés</td>
+<td>82/120 (68%)</td>
+<td><strong>97/120 (81%)</strong></td>
+<td>42/120</td>
+<td>24/120</td>
+</tr>
+<tr>
+<td>Español</td>
+<td>70/120 (58%)</td>
+<td><strong>88/120 (73%)</strong></td>
+<td>25/120</td>
+<td>13/120</td>
+</tr>
+</tbody>
+</table>
+<p>Y el detalle entre el modelo base y el de 20 capas:</p>
+<table>
+<thead>
+<tr>
+<th>test</th>
+<th>modelo</th>
+<th>exact</th>
+<th>loose-ci</th>
+<th>nombres</th>
+<th>rechazos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inglés</td>
+<td>base</td>
+<td>82</td>
+<td>99</td>
+<td>110</td>
+<td>7/12</td>
+</tr>
+<tr>
+<td>Inglés</td>
+<td>20 capas</td>
+<td>97</td>
+<td>102</td>
+<td>110</td>
+<td>7/12</td>
+</tr>
+<tr>
+<td>Español</td>
+<td>base</td>
+<td>70</td>
+<td>91</td>
+<td>104</td>
+<td>2/12</td>
+</tr>
+<tr>
+<td>Español</td>
+<td>20 capas</td>
+<td>88</td>
+<td>96</td>
+<td>105</td>
+<td>2/12</td>
+</tr>
+</tbody>
+</table>
+<h3>¿Qué fue lo que mejoró?</h3>
+<p>En estricto la mejora es de +15 en inglés y +18 en español, que se ve muy bien. Pero con <code>loose-ci</code> baja a +3 y +5, y la columna de nombres casi no se mueve (110 a 110, y 104 a 105). Eso quiere decir que el modelo ya escogía la herramienta correcta; lo que aprendió fue a llenar los argumentos como yo los espero. Por ejemplo:</p>
+<div class="highlight"><pre><span></span><code>&gt; &quot;pon las luces del estudio a 65 por ciento&quot;
+base:   control_lights(room=&quot;estudio&quot;, brightness=65, state=&quot;on&quot;)
+tuned:  control_lights(room=&quot;estudio&quot;, brightness=65)
+
+&gt; &quot;cierra con llave la puerta del desván ya&quot;
+base:   lock_door(door=&quot;desván&quot;)
+tuned:  lock_door(door=&quot;puerta del desván&quot;)
+</code></pre></div>
+
+<p>La primera corrección es buena: el modelo base agrega <code>state="on"</code> en cualquier comando de brillo. La segunda es más bien que el modelo aprendió las convenciones de mi dataset. No está mal, para eso es el fine-tuning, pero hay que tenerlo en cuenta antes de celebrar los 18 puntos.</p>
+<p>Por herramienta, las luces pasan de 7 a 15 aciertos en inglés y de 8 a 15 en español, y las puertas de 14 a 17 y de 9 a 15. <code>set_alarm</code> sigue siendo la peor (de 11 a 13 y de 7 a 9), y el termostato empeora en uno en ambos idiomas.</p>
+<h3>Lo que no mejoró</h3>
+<p>Los rechazos quedaron igual: 7 de 12 en inglés y 2 de 12 en español. Aunque el 10% de los datos de entrenamiento eran peticiones para rechazar, el modelo ajustado sigue llamando herramientas cuando no debe:</p>
+<div class="highlight"><pre><span></span><code>&gt; &quot;dame una receta de pasta&quot;
+play_music(query=&quot;receta de pasta&quot;)
+
+&gt; &quot;convierte cincuenta euros en dólares&quot;
+set_thermostat(room=&quot;cocina&quot;, temperature=50, mode=&quot;heat&quot;)
+</code></pre></div>
+
+<p>En español los acentos son frágiles. El modelo ajustado escribe <code>aceo</code> en lugar de <code>aseo</code> en varios casos, y el tokenizador gasta más tokens en español que en inglés. Fuera de eso, el comportamiento en español es muy parecido al de inglés, que era lo que más me preocupaba.</p>
+<p>La pérdida de validación bajó de manera constante (inglés 0.585 a 0.144, español 0.530 a 0.137), así que no es falta de entrenamiento ni sobreajuste: los errores que quedan son comportamientos que los datos no cubren.</p>
+<h2>¿Por qué Fallan los Modelos de 4 y 8 Capas?</h2>
+<p>Los recortes de 8 y 4 capas colapsan: 42 y 24 aciertos en inglés, 25 y 13 en español, y ninguno rechaza nada (0 de 12).</p>
+<p>El LoRA local solo entrena el modelo completo de 20 capas. La escalera original se entrena con self-distillation: el 80% de los pasos usa el modelo completo y el 20% una profundidad aleatoria entre 2 y 19 capas, con una pérdida que la acerca al modelo completo. Así cada submodelo aprende a hacer la tarea con las capas que tiene. Cuando recortas después con <code>--layers 8</code>, el submodelo hereda los pesos ajustados, pero nunca lo entrenaron para resolver la tarea con solo 8 capas.</p>
+<p>Los números de 4 capas que publica Cactus vienen de su plataforma, que entrena el modelo completo en cada profundidad y además calibra la cabeza de confianza con tus herramientas. Ese camino no lo probé; cuesta 19 dólares (3 entrenamientos) y por lo que documentan es la única forma de obtener peldaños pequeños ajustados.</p>
+<h2>Conclusión</h2>
+<p>El fine-tuning local sí funciona, y funciona en español. Te da un modelo de 20 capas ajustado a una tarea estrecha, con +15 y +18 puntos en estricto, que corre en CPU y pesa 63 MB (con W4, contra los 35 MB del modelo original a 2 bits).</p>
+<p>Lo que no te da es lo más interesante de Needle: rechazos confiables, modelos de 4 u 8 capas y la confianza para decidir si ejecutar una llamada. Si tu caso de uso necesita alguna de esas tres cosas, lo siguiente que probaría es subir el rango del LoRA a 32 con más ejemplos negativos, o pagar la plataforma. Para un asistente sencillo donde siempre hay una herramienta que llamar, el modelo de 20 capas ajustado localmente ya es usable.</p>
+                </div>
+            </article>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Cosme Zamudio. Todos los derechos reservados.</p>
+            <div class="social-links">
+                <a href="https://github.com/cosmez">GitHub</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

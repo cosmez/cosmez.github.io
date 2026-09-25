@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llama3.2 3b Español | Cosme Zamudio</title>
+    <meta name="description" content="Hasta ahora, todos los modelos de lenguaje pequeño que he intentado utilizar tienen el problema de no ser muy efectivos en español. Si bien pueden ser útiles para herramientas o para realizar cadenas de pensamiento y diferentes formas de…">
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-wrapper">
+                <a href="/" class="brand"><span class="brand-symbol">λ</span> Cosme Zamudio</a>
+                <nav>
+                    <ul>
+                        <li><a href="../../es/index.html">Servicios</a></li>
+                        <li><a href="../../es/applications.html">Aplicaciones</a></li>
+                        <li><a href="../../es/pdf-knowledge.html">Ingeniería PDF</a></li>
+                        <li><a href="../../es/dicom-engineering.html">DICOM</a></li>
+                        <li><a href="../../es/interop.html">C# Interop</a></li>
+                        <li><a href="../../blog/index.html" class="active">Blog</a></li>
+                        <li><a href="https://github.com/cosmez" target="_blank">GitHub</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <article class="post">
+                <header class="post-header">
+                    <a href="../index.html" class="post-back">&larr; Blog</a>
+                    <h1>Llama3.2 3b Español</h1>
+                    <div class="post-meta">
+                        <time datetime="2024-09-26">26 de septiembre de 2024</time>
+                        <div class="tags"><span class="tag">ai</span><span class="tag">csharp</span><span class="tag">llm</span><span class="tag">openai</span><span class="tag">programacion</span><span class="tag">llama</span><span class="tag">llama3.2</span></div>
+                    </div>
+                </header>
+                <div class="post-content">
+<figure class="post-figure"><img loading="lazy" src="../../img/blog/mexican-llama.webp" width="400" alt=""></figure>
+
+<blockquote>
+<p>Este articulo está basado en una transcripción de una serie de videos de live-coding con el modelo whisper y ChatGPT o1-preview. <a href="https://www.youtube.com/playlist?list=PLew4gWxBdrWeCGKv-eqYCcJYcKybZU33d">Playlist</a>
+<a href="https://github.com/cosmez/Llama3.2Tests">Codigo Fuente Completo del Articulo</a></p>
+</blockquote>
+<h2>Introducción</h2>
+<p>Hasta ahora, todos los modelos de lenguaje pequeño que he intentado utilizar tienen el problema de no ser muy efectivos en español. Si bien pueden ser útiles para herramientas o para realizar cadenas de pensamiento y diferentes formas de prompts, si no responden adecuadamente en español, no tiene sentido usarlos localmente.</p>
+<p>La última versión antes de esta fue <a href="https://ai.meta.com/blog/meta-llama-3-1/">Llama 3.1</a>, que salió hace aproximadamente dos meses. Esta versión 3.1 solo tenía modelos medianos y grandes, siendo el modelo más pequeño de aproximadamente 8 o 9 billones de parámetros. Este modelo apenas podía correr en mi tarjeta de video, una GTX 1080 Ti, que es algo viejita, pero tiene buena capacidad de procesamiento. Al utilizar la versión que tenía, requería alrededor de 8 gigabytes de memoria de video, pero no era óptima para las funciones que utilizamos para generar extracciones.</p>
+<h2><a href="https://ai.meta.com/blog/llama-3-2-connect-2024-vision-edge-mobile-devices/">Llama 3.2</a></h2>
+<p>Este nuevo modelo agrega capacidades de visión a los modelos existentes, lo cual es interesante, aunque actualmente no estamos trabajando con visión. Además, los runtimes que utilizo para correr y probar localmente no tienen soporte para visión, o al menos tardan más en implementarlo. Las versiones que salieron solo para texto tienen modelos de 1 y 3 billones de parámetros.</p>
+<p>Microsoft lanzó un modelo llamado <a href="https://azure.microsoft.com/en-us/products/phi/">Phi 3</a> Small, que me pareció muy bueno, pero todas mis pruebas fueron en inglés. En español, el modelo a veces cambiaba a inglés en medio de la respuesta, lo que no tenía sentido. El otro modelo que se menciona es el <a href="https://blog.google/technology/developers/google-gemma-2/">Gemma 2</a> , de 2 billones de parámetros, que ha sido calificado como superior en varias ocasiones, aunque no es tan efectivo en español. Se puede usar el <a href="https://aistudio.google.com/">Google AI Studio</a> para probar Gemma 2B, que es gratuito y accesible programáticamente a través de sus endpoints.</p>
+<p>He probado varios modelos, y el de 3B, en particular, me ha funcionado bien para hacer llamadas a herramientas. Sin embargo, el modelo en <a href="https://lmstudio.ai/">LM Studio</a> no responde adecuadamente cuando le pido que use herramientas; me devuelve JSON, pero incorrecto. Por otro lado, en OLlama ha funcionado bien, y aún tengo que hacer pruebas con el modelo de un billón de parámetros. </p>
+<p>Este modelo tiene soporte para un contexto de 128,000 tokens, lo que permite enviar mucha información al solicitar, por ejemplo, hacer una extracción. Hasta ahora, hemos estado manejando modelos de 128,000 tokens, como <a href="https://platform.openai.com/docs/models/gpt-4o-mini">GPT-4o-mini</a>, mientras que el único que supera esto es el de Google, el <a href="https://deepmind.google/technologies/gemini/flash/">Gemini 1.5 Flash</a>. Sin embargo, este modelo falla frecuentemente y a veces se queda generando tokens indefinidamente.</p>
+<p>En cuanto al rendimiento de modelos de 3b de parámetros con 128,000 tokens, se requiere una tarjeta de video con al menos 10.5 a 12 gigabytes de memoria para su funcionamiento óptimo. Mis pruebas se realizaron con prompts básicos; por ejemplo, le envié texto en español y le pedí un resumen de tres historias. Para correr esto, necesito tener el modelo de Llama 3.2 en <a href="https://ollama.com/">OLlama</a>.</p>
+<h2>Capacidad de Resumir</h2>
+<p>Generé las historias con OpenAI, donde pedí que fueran sobre tres personajes, con un título y una muerte involucrada. Posteriormente, le pedí al modelo que me generara un resumen, especificando que debía responder solo en español. Esto me devolvió un resumen apropiado.</p>
+<div class="highlight"><pre><span></span><code><span class="w">        </span><span class="kt">string</span><span class="w"> </span><span class="n">textStory01</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="n">ReadAllTextAsync</span><span class="p">(</span><span class="s">&quot;Historia01.txt&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">string</span><span class="w"> </span><span class="n">textStory02</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="n">ReadAllTextAsync</span><span class="p">(</span><span class="s">&quot;Historia02.txt&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">string</span><span class="w"> </span><span class="n">textStory03</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="n">ReadAllTextAsync</span><span class="p">(</span><span class="s">&quot;Historia03.txt&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">aiService</span><span class="p">.</span><span class="n">CompleteAsync</span><span class="p">(</span><span class="s">$&quot;Generame un resumen de 1 parrafo de la siguiente historia:\n{textStory01}&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Eres un bot que resume historias, responde solo en español&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Resultado:</p>
+<div class="highlight"><pre><span></span><code>Tres amigos de infancia se reunieron para una última partida de ajedrez en un parque tranquilo del pueblo de San Andrés. La conversación se volvió nostálgica mientras juegaban, pero la alegría se interrumpió cuando un accidente ocurrió en la carretera cercana y el más aventurero, Hugo, sacudió a su vida para salvar a alguien atrapado, aunque murió en el acto. La tragedia los dejó con lágrimas en los ojos, pero también les enseñó que su recuerdo viviría siempre en sus corazones y en cada partida futura, transformando la muerte en un homenaje a su espíritu.
+</code></pre></div>
+
+<h3>Zero-shot y Few-shot Prompting</h3>
+<p>También experimenté con zero-shot prompting, donde le pedí al modelo que extrajera nombres de una historia sin darle instrucciones específicas. Me devolvió una lista que incluía nombres, aunque en un caso no se mencionó el nombre del abuelo. Luego, probé con few-shot prompting, donde proporcioné ejemplos previos y le pedí que generara una lista de nombres con un formato especifico de la misma historia. Esto funcionó bien, y el modelo entendió el formato requerido.</p>
+<p><strong>Zero Shot</strong>:</p>
+<div class="highlight"><pre><span></span><code><span class="w"> </span><span class="n">ChatMessage</span><span class="p">[]</span><span class="w"> </span><span class="n">singleShotMessages</span><span class="w"> </span><span class="o">=</span>
+<span class="w"> </span><span class="na">[</span>
+<span class="na">     new SystemChatMessage(&quot;Eres un bot extractor de nombres de historias&quot;),</span>
+<span class="na">     new UserChatMessage($&quot;Con la siguiente historia\n{textStory03}, Dame una lista de todos los nombres&quot;)</span>
+<span class="na"> ]</span><span class="p">;</span>
+<span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">singleShotNames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">aiService</span><span class="p">.</span><span class="n">CompleteAsync</span><span class="p">(</span><span class="n">singleShotMessages</span><span class="p">);</span>
+</code></pre></div>
+
+<p><em>Respuesta</em>:</p>
+<div class="highlight"><pre><span></span><code>Aquí te presento la lista de nombres mencionados en la historia:
+
+1. Valentina (32 años)
+2. Tomás (30 años)
+3. Ana (31 años)
+4. El abuelo de Valentina (no se especifica su edad)
+
+Además, hay un personaje que no tiene nombre destacado, se refiere a la familia de Valentina que es dueña del viñedo, pero no se menciona su nombre.
+
+Espero que esta lista sea útil. ¡Si necesitas algo más, no dudes en preguntar!
+</code></pre></div>
+
+<p><strong>Few Shot</strong>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//few shot example</span>
+<span class="n">ChatMessage</span><span class="p">[]</span><span class="w"> </span><span class="n">fewShotMessages</span><span class="w"> </span><span class="o">=</span>
+<span class="na">[</span>
+<span class="na">    new SystemChatMessage(&quot;Eres un bot extractor de nombres de historias&quot;),</span>
+<span class="na">    new UserChatMessage($&quot;Con la siguiente historia:\n{textStory01}, Dame una lista de todos los nombres&quot;),</span>
+<span class="na">    new AssistantChatMessage(&quot;La Última Partida:\n\tMartín (28 años)\n\tClara (26 años)\n\tHugo (27 años)\n&quot;),</span>
+<span class="na">    new UserChatMessage($&quot;Con la siguiente historia:\n{textStory02}, Dame una lista de todos los nombres&quot;),</span>
+<span class="na">    new AssistantChatMessage(&quot;El Último Viaje:\n\tPedro (30 años)\n\tSofía (29 años)\n\tMiguel (31 años)\n&quot;),</span>
+<span class="na">    new UserChatMessage($&quot;Con la siguiente historia\n{textStory03}, Dame una lista de todos los nombres&quot;)</span>
+<span class="na">]</span><span class="p">;</span>
+
+<span class="kt">var</span><span class="w"> </span><span class="n">responseNames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">aiService</span><span class="p">.</span><span class="n">CompleteAsync</span><span class="p">(</span><span class="n">fewShotMessages</span><span class="p">);</span>
+</code></pre></div>
+
+<p><em>Respuesta</em>:</p>
+<div class="highlight"><pre><span></span><code>Recuerdos en el Viñedo:
+        Valentina (32 años)
+        Tomás (30 años)
+        Ana (31 años)
+</code></pre></div>
+
+<h3>Razonamiento Interno</h3>
+<p>Parece que Llama 3.2 se entrenó con <a href="https://www.promptingguide.ai/techniques/cot">CoT</a> en su conjunto de datos, porque es muy bueno explicando su razonamiento cuando se le pide en el prompt. Pero tiene problemas al intentar seguir una serie de pasos de razonamiento que se le dan en el mismo.</p>
+<p><strong>CoT:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">var</span><span class="w"> </span><span class="n">cotResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">aiService</span><span class="p">.</span><span class="n">CompleteAsync</span><span class="p">(</span><span class="s">&quot;¿\&quot;somos\&quot; es un palindromo? explicame tu razonamiento&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Eres un bot con razonamiento avanzado, eres bueno para describir lo que piensas y solo respondes en español&quot;</span><span class="p">);</span>
+
+<span class="kt">var</span><span class="w"> </span><span class="n">cotComplexResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">aiService</span><span class="p">.</span><span class="n">CompleteAsync</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="s">&quot;somos&quot;</span><span class="w"> </span><span class="n">es</span><span class="w"> </span><span class="n">un</span><span class="w"> </span><span class="n">palindromo</span><span class="o">?</span><span class="w"> </span><span class="n">explicame</span><span class="w"> </span><span class="n">tu</span><span class="w"> </span><span class="n">razonamiento</span><span class="p">.</span>
+<span class="w">        </span><span class="n">describe</span><span class="w"> </span><span class="n">los</span><span class="w"> </span><span class="n">siguientes</span><span class="w"> </span><span class="n">pasos</span><span class="w"> </span><span class="n">para</span><span class="w"> </span><span class="n">saber</span><span class="w"> </span><span class="n">si</span><span class="w"> </span><span class="s">&quot;somos&quot;</span><span class="w"> </span><span class="n">es</span><span class="w"> </span><span class="n">un</span><span class="w"> </span><span class="n">palindromo</span><span class="p">:</span>
+<span class="w">        </span><span class="n">Paso</span><span class="w"> </span><span class="mi">1</span><span class="p">.</span><span class="o">-</span><span class="w"> </span><span class="err">¿</span><span class="n">Cuales</span><span class="w"> </span><span class="n">son</span><span class="w"> </span><span class="n">las</span><span class="w"> </span><span class="n">reglas</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">un</span><span class="w"> </span><span class="n">palindromo</span><span class="o">?.</span>
+<span class="w">        </span><span class="n">Paso</span><span class="w"> </span><span class="mi">2</span><span class="p">.</span><span class="o">-</span><span class="w"> </span><span class="n">Aplica</span><span class="w"> </span><span class="n">las</span><span class="w"> </span><span class="n">reglas</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">un</span><span class="w"> </span><span class="n">palindromo</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">la</span><span class="w"> </span><span class="n">palabra</span><span class="w"> </span><span class="s">&quot;somos&quot;</span><span class="p">.</span>
+<span class="w">        </span><span class="n">Paso</span><span class="w"> </span><span class="mi">3</span><span class="p">.</span><span class="o">-</span><span class="w"> </span><span class="n">Provee</span><span class="w"> </span><span class="n">la</span><span class="w"> </span><span class="n">respuesta</span><span class="p">.</span>
+<span class="w">        </span><span class="s">&quot;&quot;&quot;,</span>
+<span class="w">    </span><span class="s">&quot;Eres un bot con razonamiento avanzado, eres bueno para describir lo que piensas y solo respondes en español&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p><em>Respuesta CoT Simple</em>:</p>
+<div class="highlight"><pre><span></span><code>CoT Simple Example:
+Para determinar si &quot;somos&quot; es un palíndromo, primero debemos entender qué es un palíndromo. Un palíndromo es una palabra, frase o secuencia de caracteres que se lee igual al revés. En otras palabras, si escribimos la palabra &quot;somos&quot;, mirando hacia atrás y adelante, deben ser exactamente iguales.
+
+En este caso, si escribimos &quot;somos&quot; y miramos hacia atrás y adelante, obtenemos la misma secuencia de caracteres: S-O-M-O-S. Como las letras se alinean perfectamente en ambos sentidos, &quot;somos&quot; cumple con el definitivo requisito para ser considerado un palíndromo.
+
+Por lo tanto, concluyo que sí, &quot;somos&quot; es un palíndromo.
+</code></pre></div>
+
+<p><em>Respuesta CoT Compleja</em>:</p>
+<div class="highlight"><pre><span></span><code>¡Claro! Me emociona explicar esto.
+
+Respuesta: sí, &quot;somos&quot; es un palindromo.
+
+Aquí te describo los pasos para comprobar si una palabra es un palindromo:
+
+**Paso 1.- ¿Cuales son las reglas de un palindromo?**
+
+Una palabra es un palindromo si la forma en que se escribe está idéntica al revés, es decir, si la primera letra es igual a la última letra, el segundo término del primero término, el tercer término del último término, y así sucesivamente.
+
+**Paso 2.- Aplica las reglas de un palindromo a la palabra &quot;somos&quot;**
+
+Para comprobar si &quot;somos&quot; es un palindromo, simplemente debemos mirar al revés la palabra:
+
+Original: somos
+Reversa: sosom
+
+Como es evidente que no hay coincidencia entre el original y su inversión, podemos concluir que...
+
+**Paso 3.- Provee la respuesta.**
+
+Hasta ahora hemos concluido que &quot;somos&quot; no satisface las reglas para ser considerado un palindromo, ya que al mirar al revés la palabra, vemos que no estamos ante una inversión perfecta de la misma manera que lo hace &quot;madam&quot; o &quot;radar&quot;.
+</code></pre></div>
+
+<h3>Prueba Real: Extracción de Documentos</h3>
+<p>Voy a crear una herramienta para extraer catálogos de conceptos de documentos de la <a href="https://compranet.sinaloa.gob.mx/secretaria-de-obras-publicas">Secretaría de Obras Públicas</a> del estado de Sinaloa.</p>
+<p>Para comenzar, voy a realizar una extracción rápida de todos los documentos. Estoy utilizando la librería directamente de <a href="https://github.com/openai/openai-dotnet">OpenAI</a> para este proyecto. Lo único que necesito hacer es cambiar la conexión al servidor de inferencia al que me voy a conectar. Para usar modelos locales con Ollama:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">var</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">OpenAIClientOptions</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Uri</span><span class="p">(</span><span class="s">&quot;localhost:1134&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">//</span>
+<span class="p">};</span>
+<span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;llama3.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ollama&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>También lo probé con LM Studio. En LM Studio, lo que cambia es el nombre del modelo.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">var</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">OpenAIClientOptions</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Uri</span><span class="p">(</span><span class="s">&quot;localhost:1134&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">//</span>
+<span class="p">};</span>
+<span class="c1">//lm studio</span>
+<span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;lmstudio-community/Llama-3.2-3B-Instruct-GGUF&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;lm-studio&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Finalmente, si tenemos el objetivo de extraer una lista de conceptos, generamos un esquema JSON para un tool call de OpenAI que nos proporcione esos datos:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">var</span><span class="w"> </span><span class="n">tool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aiService</span><span class="p">.</span><span class="n">GetTool</span><span class="p">(</span><span class="s">&quot;ExtractorConceptos&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Extrae Catalogo de Conceptos&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;object&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s">&quot;conceptos&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;array&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="s">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Una lista de conceptos del documento de catalogo de conceptos&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="s">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;object&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">              </span><span class="s">&quot;clave&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="s">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;clave del concepto&quot;</span>
+<span class="w">              </span><span class="p">},</span>
+<span class="w">              </span><span class="s">&quot;descripcion&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="s">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;descripcion del concepto&quot;</span>
+<span class="w">              </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="s">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;clave&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;description&quot;</span><span class="p">]</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="s">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;conceptos&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="s">&quot;&quot;&quot;);</span>
+</code></pre></div>
+
+<h2>Codigo</h2>
+<p>Para la lectura de PDFs voy a usar la librería de <a href="https://github.com/Dtronix/PDFiumCore">PdfiumCore</a>. Estoy pensando en escribir un artículo sobre cómo usar esta librería en distintos lenguajes y contar por qué es la libreria más eficiente que he encontrado para trabajar con PDFs. Se puede extraer texto de PDFs a una tasa sorprendente.</p>
+<p>El código para generar un prompt por cada página sería:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//debemos sacar codigo unsafe de codigo asincrono</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="nf">GetString</span><span class="p">(</span><span class="n">FpdfTextpageT</span><span class="w"> </span><span class="n">pageTextT</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">unsafe</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//agarramos el numero de caracteres</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">characterCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FPDFTextCountChars</span><span class="p">(</span><span class="n">pageTextT</span><span class="p">);</span><span class="w"> </span>
+<span class="w">        </span><span class="c1">//cada caracteres 2 bytes + null al final (c string)</span>
+<span class="w">        </span><span class="n">Span</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">&gt;</span><span class="w"> </span><span class="n">txt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="p">[</span><span class="n">characterCount</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span>
+<span class="w">        </span><span class="k">fixed</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="o">*</span><span class="w"> </span><span class="n">txtPtr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">txt</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//public/fpdf_text.h</span>
+<span class="w">            </span><span class="c1">//pasamos puntero a CLR fixed byte[]</span>
+<span class="w">            </span><span class="n">FPDFTextGetText</span><span class="p">(</span><span class="n">pageTextT</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">characterCount</span><span class="p">,</span><span class="w"> </span><span class="k">ref</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="kt">ushort</span><span class="o">*</span><span class="p">)</span><span class="n">txtPtr</span><span class="p">);</span><span class="w"> </span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="c1">//convertimos a unicode</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Encoding</span><span class="p">.</span><span class="n">Unicode</span><span class="p">.</span><span class="n">GetString</span><span class="p">(</span><span class="n">txt</span><span class="p">);</span><span class="w"> </span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">FPDF_InitLibrary</span><span class="p">();</span><span class="w"> </span><span class="c1">//inicializa Pdfium</span>
+<span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">filename</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">Directory</span><span class="p">.</span><span class="n">EnumerateFiles</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;*.pdf&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">SearchOption</span><span class="p">.</span><span class="n">AllDirectories</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">filename</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s">&quot;CONCEPTOS&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">StringComparison</span><span class="p">.</span><span class="n">OrdinalIgnoreCase</span><span class="p">))</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">documenT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FPDF_LoadDocument</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="w"> </span><span class="k">null</span><span class="p">);</span><span class="w"> </span><span class="c1">//abrir documento</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">pageCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FPDF_GetPageCount</span><span class="p">(</span><span class="n">documenT</span><span class="p">);</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">pageCount</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">pageT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FPDF_LoadPage</span><span class="p">(</span><span class="n">documenT</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"> </span><span class="c1">//abrir pagina</span>
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">pageTextT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FPDFTextLoadPage</span><span class="p">(</span><span class="n">pageT</span><span class="p">);</span><span class="w"> </span><span class="c1">//abrir texto</span>
+<span class="w">        </span><span class="kt">string</span><span class="w"> </span><span class="n">pageText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetString</span><span class="p">(</span><span class="n">pageTextT</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageText</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//prompt para la extraccion</span>
+<span class="w">            </span><span class="n">ChatMessage</span><span class="p">[]</span><span class="w"> </span><span class="n">chatMessages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="nf">SystemChatMessage</span><span class="p">(</span><span class="s">&quot;Eres un bot de extraccion de datos de catalogos de conceptos, responde solo con json valido.&quot;</span><span class="p">),</span>
+<span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="nf">UserChatMessage</span><span class="p">(</span><span class="err">$</span><span class="s">@&quot;Con los siguientes datos de un catalogo de conceptos \n```\n{pageText}\n```\n </span>
+<span class="s">                    Extrae una lista de conceptos con un arreglo de clave y descripcion con el formato de json: {{conceptos: [{{clave: &quot;&quot;Clave del concepto&quot;&quot;, descripcion: &quot;&quot;Descripcion del concepto&quot;&quot;}}]}}.&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="p">];</span>
+<span class="w">            </span><span class="kt">var</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ChatCompletionOptions</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">tool</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">};</span>
+<span class="w">            </span><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">aiService</span><span class="p">.</span><span class="n">CompleteAsync</span><span class="p">(</span><span class="n">chatMessages</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="p">);</span>
+<span class="w">            </span><span class="k">try</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="kt">var</span><span class="w"> </span><span class="n">parsed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonSerializer</span><span class="p">.</span><span class="n">Deserialize</span><span class="o">&lt;</span><span class="n">Concepto</span><span class="o">&gt;</span><span class="p">(</span><span class="n">response</span><span class="p">);</span>
+<span class="w">                </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&quot;Parsed Correctly&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">catch</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&quot;Failed to parse Json&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">FPDFTextClosePage</span><span class="p">(</span><span class="n">pageTextT</span><span class="p">);</span><span class="w"> </span><span class="c1">//liberar pagina</span>
+<span class="w">        </span><span class="n">FPDF_ClosePage</span><span class="p">(</span><span class="n">pageT</span><span class="p">);</span><span class="w"> </span><span class="c1">//liberar texto</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">FPDF_CloseDocument</span><span class="p">(</span><span class="n">documenT</span><span class="p">);</span><span class="w"> </span><span class="c1">//liberar documento</span>
+<span class="p">}</span>
+<span class="n">FPDF_DestroyLibrary</span><span class="p">();</span>
+</code></pre></div>
+
+<h2>Resultados</h2>
+<p>En mis pruebas, he encontrado que algunos modelos simplemente no funcionan como se esperaba. Por ejemplo, al utilizar este modelo, la respuesta fue completamente inadecuada.</p>
+<p>Llama 3.2 me respondía con estructuras de tool, pero no respetaban la estructura que esperaba. Quería ver si podíamos utilizar esto para que, por ejemplo, un usuario definiera una extracción con los datos que él espera, y nosotros simplemente llamarlo y esperar que nos regresara los datos correctos. En este caso, ya nos dimos cuenta de que, por ejemplo, OpenAI no se ha equivocado ninguna vez, a pesar de que es un modelo pequeño y muy económico.</p>
+<p>En otros casos cuando el modelo agarra el tool, no me responde con los conceptos que realmente necesito. En su lugar, recibo un esquema completo que incluye parámetros, conceptos y descripciones, pero pueden ser cadenas vacias o nulas.</p>
+<p>Al final, lo que podría sugerir en última instancia es que le indique que extraiga los conceptos utilizando el formato JSON. Le he estado dando ejemplos, y es probable que eso lo ayude. Estoy tratando de asegurarme de que el esquema que envíe sea el correcto.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ChatMessage</span><span class="p">[]</span><span class="w"> </span><span class="n">chatMessages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="nf">SystemChatMessage</span><span class="p">(</span><span class="s">&quot;Eres un bot de extraccion de datos de catalogos de conceptos, responde solo con json valido.&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="nf">UserChatMessage</span><span class="p">(</span><span class="err">$</span><span class="s">@&quot;Con los siguientes datos de un catalogo de conceptos \n```\n{pageText}\n```\n </span>
+<span class="s">        Extrae una lista de conceptos con un arreglo de clave y descripcion con el formato de json: {{conceptos: [{{clave: &quot;&quot;Clave del concepto&quot;&quot;, descripcion: &quot;&quot;Descripcion del concepto&quot;&quot;}}]}}.&quot;</span><span class="p">)</span>
+<span class="p">];</span>
+</code></pre></div>
+
+<p>He estado probando diferentes formas de estructurar el JSON, tratando de definir un arreglo de conceptos y varias maneras de facilitarle el trabajo al modelo, pero los resultados no son favorables.</p>
+<h2>Conclusion</h2>
+<p>Hasta ahora, el modelo más pequeño que ha funcionado en casi todos nuestros casos es el de <strong>GPT-4o-mini</strong>. Esta investigación es crucial para encontrar modelos que ofrezcan mejores resultados a precios más bajos, y en este caso, este modelo se planteaba como una buena opción para poder realizar aplicaciones con IA generativa en hardware de consumo general. Es sorprendente lo que puede hacer este modelo, pero por ahora no es un modelo adecuado para nuestras necesidades de extracción de datos.</p>
+                </div>
+            </article>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Cosme Zamudio. Todos los derechos reservados.</p>
+            <div class="social-links">
+                <a href="https://github.com/cosmez">GitHub</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
