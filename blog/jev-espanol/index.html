@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jev en Español: Observaciones | Cosme Zamudio</title>
+    <meta name="description" content="Jev es un modelo de TypeSafe que toma decisiones tipadas. Le das un texto y preguntas con opciones, y te regresa probabilidades en lugar de texto…">
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-wrapper">
+                <a href="/" class="brand"><span class="brand-symbol">λ</span> Cosme Zamudio</a>
+                <nav>
+                    <ul>
+                        <li><a href="../../es/index.html">Servicios</a></li>
+                        <li><a href="../../es/applications.html">Aplicaciones</a></li>
+                        <li><a href="../../es/pdf-knowledge.html">Ingeniería PDF</a></li>
+                        <li><a href="../../es/dicom-engineering.html">DICOM</a></li>
+                        <li><a href="../../es/interop.html">C# Interop</a></li>
+                        <li><a href="../../blog/index.html" class="active">Blog</a></li>
+                        <li><a href="https://github.com/cosmez" target="_blank">GitHub</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <article class="post">
+                <header class="post-header">
+                    <a href="../index.html" class="post-back">&larr; Blog</a>
+                    <h1>Jev en Español: Observaciones</h1>
+                    <div class="post-meta">
+                        <time datetime="2026-09-26">26 de septiembre de 2026</time>
+                        <div class="tags"><span class="tag">ai</span><span class="tag">llm</span><span class="tag">jev</span><span class="tag">clasificacion</span><span class="tag">programacion</span></div>
+                    </div>
+                </header>
+                <div class="post-content">
+<blockquote>
+<p>Este artículo está basado en un experimento con las transcripciones de las mañaneras de Claudia Sheinbaum (<a href="https://github.com/NOSTRODATA/conferencias_matutinas_sheinbaum">repositorio de @nostrodata</a>, CC BY-SA 4.0). Lo hice junto con varios agentes de investigación, como parte de un proceso semiautomático que estoy armando: yo decido qué se prueba y reviso, ellos escriben los scripts, corren las pruebas y me entregan un reporte técnico.</p>
+</blockquote>
+<h2>Introducción</h2>
+<p>Jev es un modelo de TypeSafe que toma decisiones tipadas. Le das un texto y preguntas con opciones, y te regresa probabilidades en lugar de texto. Hay tres tipos de pregunta: <code>noul</code> (la probabilidad de que algo sea verdad), <code>choice</code> (escoger de una lista) y <code>score</code> (una escala). Como no genera texto, no hay nada que parsear.</p>
+<p>Ya lo había probado en inglés. La documentación dice que el inglés es el idioma principal y que los demás funcionan con menos precisión, así que quería ver cuánto se pierde en español con texto real, cuál de las variantes conviene y qué problemas salen al usarlo en serio.</p>
+<p>Hoy hay tres variantes que hablan el mismo API (<code>/v1/systemone</code>), así que el mismo código funciona con cualquiera. TypeSafe es la original. Codiv ofrece OpenJev, un modelo con pesos abiertos (lo puedes descargar) y un API gratis compatible. Laya es una librería de Python que hace lo mismo en tu máquina con modelos tipo BERT: trae uno para inglés y uno multilingüe, y aquí usé el multilingüe.</p>
+<table>
+<thead><tr><th>variante</th><th>modelo</th><th>dónde corre</th></tr></thead>
+<tbody>
+<tr><td>TypeSafe Jev</td><td><code>jev-latest</code></td><td>API de TypeSafe, de paga</td></tr>
+<tr><td>Codiv OpenJev</td><td><code>openjev-latest</code></td><td>API de Codiv, gratis, pesos abiertos</td></tr>
+<tr><td>Laya</td><td><code>laya-multilingual</code></td><td>local, en CPU</td></tr>
+</tbody>
+</table>
+
+<h2>Resumen</h2>
+<ul>
+<li>TypeSafe si puedes pagar. Es el más preciso y todo el experimento costó menos de 4 centavos de dólar.</li>
+<li>Codiv si lo quieres gratis. Queda cerca, pero sus probabilidades salen bajas y hay que ajustar a partir de qué valor cuentas un sí.</li>
+<li>Laya sin fine-tuning todavía no sirve para esto.</li>
+<li>TypeSafe y Codiv cortan en 120 preguntas por request sin avisar.</li>
+</ul>
+
+<h2>El Corpus</h2>
+<p>Usé <a href="https://github.com/NOSTRODATA/conferencias_matutinas_sheinbaum">Conferencias Matutinas de la Presidenta Claudia Sheinbaum</a>, un repositorio de <a href="https://www.nostrodata.com">@nostrodata</a> con las versiones estenográficas de las mañaneras desde octubre de 2024, en CSV. La licencia es CC BY-SA 4.0 y solo piden que los menciones. También tienen <a href="https://github.com/NOSTRODATA/conferencias_matutinas_amlo">las de AMLO</a> con el mismo formato.</p>
+<p>Viene una carpeta por día con el CSV de la conferencia completa, el mismo contenido partido por participante y unas imágenes con las palabras más usadas. Yo solo usé el CSV completo, donde cada renglón es una intervención:</p>
+<div class="highlight"><pre><span></span><code>Participante,Texto,Sentimiento,Palabras,Dia,Mes,Anio
+TITULAR DEL SECRETARIADO EJECUTIVO DEL SISTEMA NACIONAL DE SEGURIDAD PUBLICA,&quot;Con su permiso, Presidenta.&quot;,0.0,4,8,4,2025
+</code></pre></div>
+<p>La columna <code>Sentimiento</code> hay que ignorarla, el README avisa que todavía no es válida.</p>
+<p>Mi copia llega al 22 de agosto de 2025: 221 conferencias, 84,547 intervenciones, unos 2.5 millones de palabras y 377 participantes. La Presidenta tiene el 45.7% de las intervenciones y la prensa el 17.8%, y la mediana es de 27 palabras por intervención.</p>
+<p>Cada intervención es el <code>state</code> que recibe Jev. Descarté las de menos de 40 caracteres, que son casi puros saludos y "Con su permiso, Presidenta.", y quedó el 84%.</p>
+
+<h2>El Experimento</h2>
+<p>Un request lleva el texto y las preguntas:</p>
+<div class="highlight"><pre><span></span><code><span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;jev-latest&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;Hoy vamos a informar sobre el plan de Pemex para este año...&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;questions&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;dep_pemex&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;noul&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;¿Se menciona Pemex?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;criteria&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;false&quot;</span><span class="p">:</span> <span class="s2">&quot;No se menciona&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">:</span> <span class="s2">&quot;Sí se menciona&quot;</span><span class="p">},</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>La respuesta trae una probabilidad por pregunta. Recortada, se ve así:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;answers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;dep_pemex&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;noul&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.97</span><span class="p">}}}</span>
+</code></pre></div>
+<p>Arriba de 0.5 lo cuento como sí.</p>
+<p>Hice dos pruebas. La primera son 120 preguntas de tipo "¿Se menciona X?" sobre estados, dependencias, programas sociales, personas, países, fechas, cifras y palabras clave. La respuesta correcta la calcula un matcher, o sea, código que busca la palabra en el texto con una lista de variantes:</p>
+<div class="highlight"><pre><span></span><code><span class="n">add</span><span class="p">(</span><span class="s2">&quot;dependencia&quot;</span><span class="p">,</span> <span class="s2">&quot;dep_pemex&quot;</span><span class="p">,</span> <span class="s2">&quot;¿Se menciona Pemex?&quot;</span><span class="p">,</span>
+    <span class="p">{</span><span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="s2">&quot;alts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;pemex&quot;</span><span class="p">,</span> <span class="s2">&quot;petroleos mexicanos&quot;</span><span class="p">]})</span>
+</code></pre></div>
+<p>Para esto bastaría una regex, y justo por eso lo escogí: con la respuesta conocida puedo revisar si las probabilidades son ciertas.</p>
+<p>Casi todo lo que pregunté es raro en el corpus. Aguascalientes aparece en el 0.07% de las intervenciones, así que con textos al azar más del 90% de las respuestas serían "no", y un modelo que siempre diga que no sacaría buena calificación. Por eso tomé, para cada pregunta, 8 textos donde la respuesta es sí y 8 donde es no: 1,920 decisiones por variante. De aquí en adelante les digo positivos a los textos donde la respuesta correcta es sí, y negativos a los demás.</p>
+<p>La segunda se parece más a un uso real. Son 120 preguntas de la prensa y una pregunta <code>choice</code>, "¿A qué área del gobierno corresponde esta pregunta?", con 10 opciones: seguridad, salud, economía, educación, bienestar, infraestructura, energía, exterior, política y otros. Aquí no hay regex que valga, y las etiquetas las puso un agente con una descripción corta de cada área (seguridad, por ejemplo, era "delincuencia, violencia, cárteles, fuerzas armadas, policía, derechos humanos"). Esas mismas descripciones iban en los criterios de la pregunta. Tiró 25 preguntas que eran fragmentos sin contexto y las cambió por otras del mismo mes.</p>
+<p>Para comparar uso la exactitud con umbral de 0.5; el AUC, que mide qué tan bien pone los positivos arriba de los negativos sin importar el umbral (1.0 es perfecto, 0.5 es azar); y dos medidas de calibración, Brier y ECE, que dicen si cuando el modelo contesta 0.9 acierta el 90% de las veces. En esas dos, más bajo es mejor. En el ruteo también reviso la confianza, que es la probabilidad que el modelo le da a la opción que escogió.</p>
+
+<h2>Resultados</h2>
+<p>Menciones, 1,920 decisiones:</p>
+<table class="texto">
+<thead><tr><th></th><th>TypeSafe</th><th>Codiv</th><th>Laya</th></tr></thead>
+<tbody>
+<tr><td>exactitud</td><td><strong>97.9%</strong></td><td>93.5%</td><td>71.8%</td></tr>
+<tr><td>AUC</td><td><strong>0.998</strong></td><td>0.991</td><td>0.822</td></tr>
+<tr><td>Brier</td><td><strong>0.017</strong></td><td>0.052</td><td>0.205</td></tr>
+<tr><td>ECE</td><td><strong>0.045</strong></td><td>0.088</td><td>0.165</td></tr>
+<tr><td>latencia por request (mediana)</td><td>323 ms</td><td>475 ms</td><td><strong>114 ms</strong></td></tr>
+<tr><td>costo de toda la corrida</td><td>$0.029</td><td>gratis</td><td>local</td></tr>
+</tbody>
+</table>
+<p>Ruteo, 120 preguntas de prensa:</p>
+<table class="texto">
+<thead><tr><th></th><th>TypeSafe</th><th>Codiv</th><th>Laya</th></tr></thead>
+<tbody>
+<tr><td>exactitud</td><td><strong>87.5%</strong></td><td>82.5%</td><td>46.7%</td></tr>
+<tr><td>errores</td><td>15</td><td>21</td><td>64</td></tr>
+<tr><td>confianza promedio cuando acierta</td><td>0.906</td><td>0.934</td><td>0.666</td></tr>
+<tr><td>confianza promedio cuando falla</td><td>0.820</td><td>0.836</td><td>0.418</td></tr>
+</tbody>
+</table>
+<p>Política es el área más común (28 de las 120), así que contestar siempre "política" daría 23.3%; TypeSafe y Codiv están muy arriba de eso. Muchas de las confusiones son discutibles: a un cártel que Estados Unidos designó grupo terrorista el agente lo etiquetó "exterior" y los modelos dijeron "seguridad". Con un solo anotador y áreas de 2 a 4 preguntas, este número me sirve para comparar variantes y nada más.</p>
+
+<h2>¿Dónde Falla Cada Uno?</h2>
+<p>Cada punto de esta gráfica es una decisión. Los verdes deberían quedar a la derecha y los grises a la izquierda.</p>
+<figure class="chart" id="grafica-distribucion">
+<div class="chart-body"><p class="chart-loading">Cargando gráfica…</p></div>
+<figcaption class="chart-caption">Probabilidad que dio cada variante, separada por la respuesta correcta. La línea punteada es 0.5. Pasa el cursor sobre un punto para ver la pregunta.</figcaption>
+</figure>
+
+<h3>TypeSafe</h3>
+<p>De sus 38 fallos, 18 son de siglas. En 7 la pregunta decía "Semar" y el texto "Secretaría de Marina":</p>
+<div class="highlight"><pre><span></span><code>&gt; &quot;…personal de la Secretaría de Marina detuvo a 5 personas…&quot;
+typesafe  0.26
+codiv     0.58
+laya      0.01
+
+&gt; &quot;(INICIA VIDEO DE LA SECRETARÍA DE MARINA)&quot;
+typesafe  0.23
+codiv     0.66
+laya      0.04
+</code></pre></div>
+<p>Lo mismo con Hacienda y SHCP (7) y Agricultura y SADER (4). Aquí la culpa es más de la pregunta que del modelo: los criterios solo decían "Sí se menciona", y leerlo literal es razonable.</p>
+
+<h3>Codiv</h3>
+<p>Codiv es el caso raro. A los negativos les da casi cero (0.005 en promedio), pero a los positivos 0.819, contra 0.936 de TypeSafe, y con el umbral en 0.5 dice que no a 123 positivos. Mueve el umbral:</p>
+<figure class="chart" id="grafica-umbral">
+<div class="chart-body"><p class="chart-loading">Cargando gráfica…</p></div>
+<figcaption class="chart-caption">Exactitud de cada variante según el umbral. La línea gris punteada es 0.5.</figcaption>
+</figure>
+<p>Con el umbral casi en cero sube a 98.3%, muy cerca de TypeSafe: como a los negativos les da prácticamente cero, cualquier cosa un poco arriba ya es un positivo. Pero ese umbral lo escogí viendo las respuestas correctas, así que el 98.3% es optimista. Si vas a usar Codiv con otro umbral, escógelo con un set de textos tuyo y mide con otro distinto.</p>
+<p>Donde más me sorprendió fue en menciones literales. En 7 de los 8 textos de "¿Se menciona a Donald Trump?" el texto dice "Trump" tal cual y Codiv contesta que no; con SAT pasa lo mismo. Con las siglas tampoco es consistente: el nombre completo de la Secretaría de Marina sí lo conecta con Semar, mejor que TypeSafe, pero a los 7 textos que dicen "Secretaría de Relaciones Exteriores" les da 0.00 para SRE.</p>
+<div class="highlight"><pre><span></span><code>&gt; &quot;¿Cuál es el nuevo panorama ahora que no se va a reunir con el presidente Donald Trump?&quot;
+typesafe  0.99
+codiv     0.02
+laya      0.32
+
+&gt; &quot;El SAT, la CRE, que próximamente se va a convertir en la Comisión Nacional de Energía…&quot;
+typesafe  0.99
+codiv     0.31
+laya      0.38
+</code></pre></div>
+<p>Con Trump no sé qué pasa. El primer ejemplo dice "Donald Trump" completo y aun así le da 0.02.</p>
+
+<h3>Laya</h3>
+<p>Corre local y es la más rápida, 114 ms por request en CPU, pero sin fine-tuning casi no distingue positivos de negativos: a los positivos les da 0.52 en promedio, casi una moneda al aire. Su README ya avisa que los checkpoints base están pensados para hacerles fine-tuning.</p>
+
+<h2>El Tope de 120 Preguntas</h2>
+<p>Jev está pensado para hacer muchas preguntas sobre el mismo texto en un solo request. Antes de la corrida probé cuántas aguanta cada variante, y TypeSafe y Codiv regresan solo las primeras 120, con HTTP 200 y sin avisar:</p>
+<figure class="chart">
+<svg class="chart-svg" viewBox="0 0 720 230" role="img" aria-label="Mandas 256 preguntas y recibes 120 respuestas con HTTP 200">
+  <style>
+    .t { font: 14px Inter, -apple-system, "Segoe UI", Roboto, sans-serif; fill: #1f2937; }
+    .s { font: 13px Inter, -apple-system, "Segoe UI", Roboto, sans-serif; fill: #4b5563; }
+    .w { font: 600 14px Inter, -apple-system, "Segoe UI", Roboto, sans-serif; fill: #ffffff; }
+    .r { font: 600 13px Inter, -apple-system, "Segoe UI", Roboto, sans-serif; fill: #dc2626; }
+  </style>
+  <text class="t" x="0" y="52" font-weight="600">Mandas</text>
+  <rect x="120" y="30" width="580" height="36" rx="4" fill="#dbeafe" stroke="#2563eb"/>
+  <text class="t" x="256" y="53" text-anchor="middle">256 preguntas</text>
+  <text class="t" x="0" y="132" font-weight="600">Recibes</text>
+  <rect x="120" y="110" width="272" height="36" rx="4" fill="#2563eb"/>
+  <text class="w" x="256" y="133" text-anchor="middle">120 respuestas</text>
+  <rect x="392" y="110" width="308" height="36" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="5,4"/>
+  <text class="r" x="546" y="133" text-anchor="middle">136 sin respuesta y sin error</text>
+  <line x1="392" y1="20" x2="392" y2="165" stroke="#111827" stroke-dasharray="3,3"/>
+  <text class="s" x="392" y="182" text-anchor="middle">tope: 120</text>
+  <rect x="120" y="198" width="210" height="26" rx="13" fill="#f0fdf4" stroke="#16a34a"/>
+  <text class="s" x="225" y="216" text-anchor="middle" fill="#15803d">HTTP 200, sin campo de aviso</text>
+  <text class="s" x="345" y="216">Con 1,024 preguntas pasa lo mismo: regresa las primeras 120.</text>
+</svg>
+<figcaption class="chart-caption">Probado con un texto de 500 caracteres y 16, 64, 256 y 1,024 preguntas. Laya no tiene tope; lo probé hasta 320, a unos 200 ms por pregunta en CPU.</figcaption>
+</figure>
+<p>Yo mando paquetes de 96, el 80% del tope para dejar margen, y reviso que regresen todas:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">paquetes</span><span class="p">(</span><span class="n">preguntas</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">96</span><span class="p">):</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">preguntas</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">preguntas</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">]}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">preguntar</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">preguntas</span><span class="p">):</span>
+    <span class="n">respuestas</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">paquete</span> <span class="ow">in</span> <span class="n">paquetes</span><span class="p">(</span><span class="n">preguntas</span><span class="p">):</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span> <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span> <span class="s2">&quot;questions&quot;</span><span class="p">:</span> <span class="n">paquete</span><span class="p">}</span>
+        <span class="n">answers</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/v1/systemone&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;answers&quot;</span><span class="p">]</span>
+        <span class="n">faltan</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">paquete</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">faltan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;regresó </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span><span class="si">}</span><span class="s2"> de </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paquete</span><span class="p">)</span><span class="si">}</span><span class="s2"> preguntas&quot;</span><span class="p">)</span>
+        <span class="n">respuestas</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">respuestas</span>
+</code></pre></div>
+<p>El tamaño del paquete no cambia las respuestas. Repetí 16 preguntas 5 veces y también las metí en paquetes de 64, y ninguna cambió de sí a no. Lo que sí se mueve un poco es la probabilidad: en promedio 0.005 en TypeSafe (un 0.970 puede salir 0.975 en otra corrida) y 0.0004 en Codiv. Eso no alcanza para cambiar ninguna respuesta.</p>
+
+<h2>Otros Detalles</h2>
+<p>Lo de Semar se arregla escribiendo mejor la pregunta: poner la sigla y el nombre completo, y decir en el criterio que cualquiera de los dos cuenta. No lo probé, pero sería algo así:</p>
+<div class="highlight"><pre><span></span><code><span class="s2">&quot;dep_semar&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;noul&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;¿Se menciona la Secretaría de Marina (Semar)?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;criteria&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;false&quot;</span><span class="p">:</span> <span class="s2">&quot;No se menciona&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;true&quot;</span><span class="p">:</span> <span class="s2">&quot;Se menciona como Semar o como Secretaría de Marina&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Mandar una pregunta por request sale caro. Como cada pregunta tenía sus propios textos, casi nunca coincidieron dos preguntas en el mismo texto: de 1,891 requests, 1,862 llevaron una sola pregunta. TypeSafe cobró unos 360 tokens por request, mucho más que lo que pesa el texto, porque también cobra su plantilla interna. En la prueba del tope, con 64 preguntas sobre el mismo texto, salió a unos 47 tokens por pregunta. No es el mismo texto, pero la diferencia es grande. Igual las 1,920 decisiones costaron 2.9 centavos de dólar, así que esto solo importa con volumen grande.</p>
+<p>Codiv regresa 403 de Cloudflare (error 1010) si llamas con <code>urllib</code> y su User-Agent por defecto. Con uno de navegador funciona.</p>
+<p>Con Laya conviene forzar el idioma. Laya escoge solo entre su modelo de inglés y el multilingüe según el texto, y en mis pruebas mandó al de inglés frases cortas en español sin acentos, como "Hola, necesitamos un reembolso por un cargo duplicado.". No medí qué tan mal contesta el de inglés con español, pero no está entrenado para eso, y su documentación dice que con otros alfabetos contesta mal y con mucha confianza. Ese modelo además avisa al cargarlo que su calibración viene mal ajustada:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">laya</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">router</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">texto</span><span class="p">,</span> <span class="n">preguntas</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;multilingual&quot;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;es&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>El idioma de las preguntas también importa, por lo menos en Laya. En una prueba rápida aparte le pasé un mensaje de cliente en español que termina con "o cancelamos el plan", y le pregunté si el cliente amenaza con cancelar:</p>
+<div class="highlight"><pre><span></span><code>&gt; &quot;Hola, nos cobraron dos veces marzo. Por favor devuelvan el cargo duplicado hoy o cancelamos el plan.&quot;
+pregunta en inglés  (&quot;Does the user threaten to cancel or leave?&quot;)   0.03
+pregunta en español (&quot;¿El usuario amenaza con cancelar o irse?&quot;)     0.86
+</code></pre></div>
+<p>El mensaje es el mismo y la respuesta correcta es sí; solo cambia el idioma de la pregunta. Es un solo caso y no lo probé con TypeSafe ni con Codiv, pero yo escribiría las preguntas en el idioma del texto.</p>
+
+<h2>Explorador</h2>
+<p>Escoge una pregunta y ve los 16 textos que se usaron, con lo que contestó cada variante. En rojo están los fallos.</p>
+<figure class="chart" id="explorador">
+<div class="chart-body"><p class="chart-loading">Cargando datos…</p></div>
+</figure>
+
+<h2>Bugs en las Respuestas Correctas</h2>
+<p>En la primera corrida, varios "fallos" de los modelos eran bugs de los matchers:</p>
+<table class="texto">
+<thead><tr><th>pregunta</th><th>el matcher contaba…</th><th>corrección</th></tr></thead>
+<tbody>
+<tr><td>SAT</td><td>"de<strong>sat</strong>ada", "<strong>sat</strong>elital"</td><td>palabra completa</td></tr>
+<tr><td>Semar</td><td>"<strong>SEMAR</strong>NAT"</td><td>palabra completa</td></tr>
+<tr><td>algún mes</td><td>"El <strong>Mayo</strong>" Zambada</td><td>exigir contexto de fecha</td></tr>
+<tr><td>agua</td><td>"a<strong>gua</strong>ntar"</td><td>palabra completa</td></tr>
+<tr><td>salud</td><td>"<strong>salud</strong>ar"</td><td>palabra completa</td></tr>
+<tr><td>Beca Benito Juárez</td><td>el aeropuerto y la alcaldía</td><td>"beca" cerca del nombre</td></tr>
+<tr><td>Beca Rita Cetina</td><td>la persona, no la beca</td><td>"beca" cerca del nombre</td></tr>
+<tr><td>plazo</td><td>"28 años" (una edad)</td><td>solo días, semanas o meses</td></tr>
+<tr><td>Salud Casa por Casa</td><td>cualquier visita "casa por casa"</td><td>el nombre completo del programa</td></tr>
+<tr><td>cifra en millones</td><td>no contaba "millón" en singular</td><td>aceptar singular y plural</td></tr>
+</tbody>
+</table>
+<p>Corregimos los diez y repetimos todo; los números de arriba son de la segunda corrida. Dejé algunas ambigüedades: estados que también son apellidos (Hidalgo, Guerrero, Morelos), Ciudad Hidalgo, que está en Chiapas, y "mexicana" contada como mención de México.</p>
+
+<h2>Conclusión</h2>
+<p>Jev sí funciona en español. TypeSafe falló 38 veces de 1,920, y casi la mitad fueron siglas que la pregunta no explicaba. Lo que más me cambió la forma de usarlo no tiene que ver con el idioma: el tope de 120 preguntas que no avisa, y que con Codiv hay que escoger otro umbral.</p>
+<p>Si tuviera que meterlo hoy a un sistema, usaría TypeSafe y en las preguntas pondría la sigla y el nombre completo ("¿Se menciona la Secretaría de Marina (Semar)?"). Codiv lo dejaría para algo donde el costo pese más y tenga datos para escoger el umbral. A Laya le falta el fine-tuning, y eso es lo siguiente que quiero probar, con este mismo corpus.</p>
+<p>Los números son de <code>jev-latest</code> y <code>openjev-latest</code> del 25 de septiembre de 2026. Son alias, así que pueden cambiar.</p>
+                </div>
+            </article>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Cosme Zamudio. Todos los derechos reservados.</p>
+            <div class="social-links">
+                <a href="https://github.com/cosmez">GitHub</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.17/dist/plot.umd.min.js"></script>
+    <script src="../../js/charts.js"></script>
+    <script src="data/grounding.js"></script>
+    <script src="graficas.js"></script>
+</body>
+</html>

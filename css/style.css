@@ -143,6 +143,12 @@ nav a:hover, nav a.active {
     border-top: 1px solid var(--border);
 }
 
+/* Primera sección de una página sin hero: el header ya trae su borde */
+.section-first {
+    border-top: 0;
+    padding-top: 0.5rem;
+}
+
 .section-title {
     margin-bottom: 2.5rem;
 }
@@ -425,9 +431,147 @@ footer {
     white-space: nowrap;
 }
 
+/* Tablas con texto largo: parten líneas en vez de hacer scroll */
+.post-content table.texto {
+    display: table;
+    width: 100%;
+}
+
+.post-content table.texto th,
+.post-content table.texto td {
+    white-space: normal;
+}
+
+@media (max-width: 768px) {
+    .post-content table.texto th,
+    .post-content table.texto td {
+        padding: 0.45rem 0.5rem;
+    }
+}
+
 .post-content th {
     font-weight: 600;
     background-color: var(--bg-secondary);
+}
+
+/* Gráficas (Observable Plot, js/charts.js) */
+.chart {
+    margin-top: 1.75rem;
+    margin-bottom: 1.75rem;
+}
+
+.chart-body {
+    min-height: 120px;
+}
+
+.chart-body svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.chart-caption {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-top: 0.6rem;
+}
+
+.chart-loading,
+.chart-error {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.chart-error {
+    color: #dc2626;
+}
+
+.chart-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.9rem;
+}
+
+.chart-controls label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.chart-controls input[type="range"] {
+    width: 220px;
+    accent-color: var(--accent);
+}
+
+.chart-controls select {
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 auto;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.chart-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.chart-legend i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.post-content .chart table {
+    font-size: 0.88rem;
+}
+
+.post-content .chart td.wrap {
+    white-space: normal;
+    min-width: 260px;
+    line-height: 1.5;
+}
+
+.post-content .chart td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.post-content .chart td.miss {
+    color: #dc2626;
+    font-weight: 600;
+    background-color: #fef2f2;
+}
+
+.post-content .chart td.hit {
+    color: #15803d;
+}
+
+.post-content .chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 /* Syntax highlighting (Pygments classes) */
