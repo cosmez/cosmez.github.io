@@ -28,9 +28,16 @@
         </header>
 
         <main>
-            <section class="hero">
+            <section class="hero hero-repl">
                 <h1>Arquitecto de Software &<br>Ingeniero en Soluciones IA</h1>
                 <p>Más de 20 años de experiencia construyendo sistemas de alto rendimiento. Desde arquitectura empresarial .NET hasta agentes de IA avanzados y herramientas profundas de procesamiento PDF.</p>
+                <div class="repl" data-lang="es" aria-label="Intérprete de Scheme interactivo">
+                    <pre class="repl-screen">(define Y
+  (lambda (le)
+    ((lambda (f) (f f))
+     (lambda (f)
+       (le (lambda (x) ((f f) x)))))))</pre>
+                </div>
             </section>
 
             <section class="section">
@@ -77,6 +84,7 @@
         </footer>
     </div>
 
+    <script src="../js/lisp.js"></script>
     <script>
         async function loadGithubRepos() {
             const specificRepos = [
