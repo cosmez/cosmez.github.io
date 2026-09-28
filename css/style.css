@@ -574,6 +574,33 @@ footer {
     height: auto;
 }
 
+/* Audio: clips con etiqueta (pares antes/después) */
+.audio {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.audio-fila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.audio-etiqueta {
+    flex: 0 0 13rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.audio audio {
+    flex: 1 1 16rem;
+    min-width: 0;
+    max-width: 100%;
+    height: 2.5rem;
+}
+
 /* Syntax highlighting (Pygments classes) */
 .highlight .c, .highlight .ch, .highlight .cm, .highlight .c1, .highlight .cpf { color: #6b7280; font-style: italic; }
 .highlight .cp { color: #9333ea; }

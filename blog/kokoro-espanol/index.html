@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kokoro en Español: Audiolibros en CPU | Cosme Zamudio</title>
+    <meta name="description" content="Kokoro es un modelo de texto a voz de 82 millones de parámetros con licencia Apache 2.0. Le das un texto y una voz, y te regresa el audio…">
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-wrapper">
+                <a href="/" class="brand"><span class="brand-symbol">λ</span> Cosme Zamudio</a>
+                <nav>
+                    <ul>
+                        <li><a href="../../es/index.html">Servicios</a></li>
+                        <li><a href="../../es/applications.html">Aplicaciones</a></li>
+                        <li><a href="../../es/pdf-knowledge.html">Ingeniería PDF</a></li>
+                        <li><a href="../../es/dicom-engineering.html">DICOM</a></li>
+                        <li><a href="../../es/interop.html">C# Interop</a></li>
+                        <li><a href="../../blog/index.html" class="active">Blog</a></li>
+                        <li><a href="https://github.com/cosmez" target="_blank">GitHub</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <article class="post">
+                <header class="post-header">
+                    <a href="../index.html" class="post-back">&larr; Blog</a>
+                    <h1>Kokoro en Español: Audiolibros en CPU</h1>
+                    <div class="post-meta">
+                        <time datetime="2026-09-28">28 de septiembre de 2026</time>
+                        <div class="tags"><span class="tag">ai</span><span class="tag">tts</span><span class="tag">kokoro</span><span class="tag">programacion</span></div>
+                    </div>
+                </header>
+                <div class="post-content">
+<blockquote>
+<p>Este artículo está basado en una investigación que hice junto con varios agentes de investigación, como parte de un proceso semiautomático que estoy armando: yo decido qué se prueba y reviso, ellos escriben los scripts, corren las pruebas y me entregan un reporte técnico. Los clips de audio son de textos de dominio público: <a href="https://es.wikisource.org/wiki/Nuestra_Am%C3%A9rica">"Nuestra América"</a> de José Martí (1891) y la traducción de Helen Zimmern de <a href="https://www.gutenberg.org/ebooks/4363"><em>Beyond Good and Evil</em></a> (Project Gutenberg).</p>
+</blockquote>
+<h2>Introducción</h2>
+<p><a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro</a> es un modelo de texto a voz de 82 millones de parámetros con licencia Apache 2.0. Le das un texto y una voz, y te regresa el audio. El archivo ONNX pesa 311 MB y corre en CPU, sin GPU y sin ningún servicio en la nube. Su página en Hugging Face (el model card) lista 54 voces en 9 idiomas; el archivo de voces que usé trae 50. Tres son de español: <code>ef_dora</code>, <code>em_alex</code> y <code>em_santa</code>.</p>
+<p>Kokoro trabaja con fonemas, los sonidos escritos en el alfabeto fonético (IPA): "casa" se escribe <code>kˈasa</code> y "hojas", <code>ˈoxas</code>. Para convertir el texto a fonemas usa <a href="https://github.com/espeak-ng/espeak-ng">espeak-ng</a>, un sintetizador de voz viejo de código abierto que aquí solo sirve como diccionario de pronunciación.</p>
+<p>En el model card, los autores califican cada voz según la calidad y la cantidad de audio con que se entrenó. La mejor es <code>af_heart</code>, de inglés, con A:</p>
+<figure class="audio">
+<div class="audio-fila"><span class="audio-etiqueta"><code>af_heart</code></span><audio controls preload="none" src="audio/ingles-af_heart.mp3"></audio></div>
+<figcaption class="chart-caption">Primeras frases del §1 de <em>Beyond Good and Evil</em>, traducción de Helen Zimmern. 28 segundos.</figcaption>
+</figure>
+<p>Las voces de español no tienen calificación, y el mismo model card avisa que fuera del inglés el soporte puede ser delgado.</p>
+<p>Yo quería ver si sirve para hacer audiolibros en español: qué tan bien suena, qué tan rápido genera en CPU y si se pueden sacar subtítulos sincronizados. Para correrlo usé <a href="https://github.com/nazdridoy/kokoro-tts">kokoro-tts</a>, un CLI que lee TXT, EPUB y PDF, y por debajo <a href="https://github.com/thewh1teagle/kokoro-onnx">kokoro-onnx</a>, la librería de Python que corre el modelo.</p>
+<h2>Resumen</h2>
+<ul>
+<li>En español sí sirve, pero no tal como viene: sin cambios suena a España, con acento inglés en la r y en la jota.</li>
+<li>En CPU genera como tres veces más rápido que el tiempo real.</li>
+<li>A velocidad normal se oye apurado. A 0.75 se escucha bien.</li>
+<li>Los números hay que escribirlos con letra.</li>
+</ul>
+<h2>Los Libros</h2>
+<p>Lo probé con dos libros de mi biblioteca: la Parte 1 de <em>Beyond Good and Evil</em> de Nietzsche, en la traducción al inglés de Judith Norman (Cambridge), y el Capítulo I de <em>El Capital</em> de Marx en español, de una edición en PDF de Feedbooks. Las dos traducciones tienen derechos, así que no publico ese audio ni el texto. Las cifras de abajo salen de esos libros; todo lo que se escucha en este post es de textos de dominio público.</p>
+<p>Los dos venían en PDF y ninguno se podía mandar tal cual. El de Nietzsche tiene texto digital, pero sucio: palabras pegadas donde termina una cursiva ("truthfulnessthatallphilosophers"), ligaduras (<code>ﬁ</code>), notas al pie, encabezados, diéresis separadas de su letra ("Tu¨ bingen") y los números de página y de sección escritos con caracteres especiales de la fuente, que al copiar el texto salen como símbolos raros en lugar de dígitos. Lo limpiamos filtrando por tamaño de letra (el cuerpo va en 11 puntos, las notas en 6 a 8) y reconstruyendo los espacios por la distancia entre letras. Quedaron 7,579 palabras en 23 secciones.</p>
+<p>El de <em>El Capital</em> estaba más limpio: las notas al pie vienen todas juntas al final del capítulo y el tamaño de letra separa el cuerpo de todo lo demás. Quedaron 14,910 palabras. Esa edición no trae la sección del fetichismo de la mercancía; el capítulo termina en la forma dinero.</p>
+<h2>El Experimento</h2>
+<p>Con kokoro-onnx, generar audio se ve así. Le das el texto, la voz, la velocidad y el idioma, y te regresa las muestras de audio y cuántas van por segundo (24,000):</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">kokoro_onnx</span><span class="w"> </span><span class="kn">import</span> <span class="n">Kokoro</span>
+
+<span class="n">kokoro</span> <span class="o">=</span> <span class="n">Kokoro</span><span class="p">(</span><span class="s2">&quot;kokoro-v1.0.onnx&quot;</span><span class="p">,</span> <span class="s2">&quot;voices-v1.0.bin&quot;</span><span class="p">)</span>
+<span class="n">samples</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">kokoro</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">texto</span><span class="p">,</span> <span class="n">voice</span><span class="o">=</span><span class="s2">&quot;em_alex&quot;</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;es&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Para cada libro el proceso fue el mismo: partir el texto limpio en trozos de unos 700 caracteres, generar un MP3 por trozo y unirlos con ffmpeg. Trabajar por trozos permite reanudar si algo truena a la mitad, y el tamaño salió de una recomendación del model card que, como explico más abajo, calculamos mal. Armamos también una página con el audio, los subtítulos que avanzan y una imagen por sección, pero no la publico por los derechos del texto.</p>
+<p>Todo corrió en mi Ryzen 7 3700X, dentro de WSL, sin tocar la GPU. Para medir la velocidad uso el RTF (<em>real-time factor</em>): el tiempo que tarda en generar el audio dividido entre lo que dura el audio. Si un minuto de audio tarda 18 segundos en generarse, el RTF es 0.30. Menos de 1 quiere decir que genera más rápido de lo que tardas en escucharlo; 0.30 es como tres veces más rápido.</p>
+<p>Para los subtítulos hay que saber en qué segundo del audio se dice cada palabra. Para eso usamos Whisper, el modelo de reconocimiento de voz de OpenAI, con <a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a>, que corre en CPU. Le das un audio y te regresa el texto que oyó, con el segundo en que empieza y termina cada palabra.</p>
+<p>Whisper se equivoca a veces, pero aquí no importa tanto, porque el texto correcto ya lo tenemos: es el mismo que le mandamos a Kokoro. Un script pone en fila las palabras del libro y las que oyó Whisper, y cuando una coincide, la palabra del libro se queda con el tiempo que dio Whisper. Si una palabra no coincide, porque Whisper la oyó distinto o se la saltó, su tiempo se calcula entre el de la palabra anterior y el de la siguiente que sí coincidieron.</p>
+<h2>Resultados</h2>
+<p>En la tabla, audio es lo que dura el libro narrado y CPU lo que tardó en generarse:</p>
+<table>
+<thead><tr><th>libro</th><th>idioma</th><th>voz</th><th>trozos</th><th>audio</th><th>CPU</th><th>RTF</th></tr></thead>
+<tbody>
+<tr><td>Nietzsche, Parte 1</td><td>inglés</td><td><code>af_heart</code></td><td>73</td><td>42.9 min</td><td>12 min</td><td>0.28 a 0.38</td></tr>
+<tr><td>Marx, Capítulo I</td><td>español</td><td><code>em_alex</code></td><td>144</td><td>80.3 min</td><td>23.6 min</td><td>0.29</td></tr>
+<tr><td>Marx, Capítulo I a 0.75×</td><td>español</td><td><code>em_alex</code></td><td>144</td><td>110.4 min</td><td>33.6 min</td><td>0.30</td></tr>
+</tbody>
+</table>
+<p>El log de Nietzsche se cortó en el trozo 68 por un bug de kokoro-onnx que explico en Otros Detalles, así que su tiempo de CPU es de los primeros 67 trozos. Cargar el modelo tarda unos 2.5 segundos. En los clips cortos de este post, de 6 a 11 segundos, el RTF quedó entre 0.34 y 0.51.</p>
+<p>En los subtítulos, el 95.4% de las palabras de Nietzsche coincidieron con lo que oyó Whisper (en el peor trozo, el 83.3%), y el 95.7% en <em>El Capital</em> (en el peor, el 79.2%). Con el modelo <code>base</code> de Whisper, en CPU, alinear los 110 minutos de <em>El Capital</em> tardó 6.5 minutos.</p>
+<p>Whisper sirve para sacar los tiempos, pero no para calificar qué tan bien habla Kokoro. Más abajo, en la sección del español, hay dos clips con el mismo texto, uno con pronunciación de España y otro latinoamericana; se oyen distintos, y Whisper los transcribió exactamente igual. Y los trozos de <em>El Capital</em> donde menos coincidió son los de las ecuaciones de la forma del valor ("20 varas de lienzo = 1 levita"). Ahí Kokoro leyó el "=" como "igual", "1/2" como "uno barra dos" y el "2°" como "grados", palabras que no están escritas así en el texto, y Whisper escribió "baras" y "lienso", que es como suenan con seseo. El porcentaje baja por los símbolos y la ortografía; yo esas partes las revisaría con el texto antes de generar el audio.</p>
+<p>En MP3 mono a unos 60 kbps, una hora de audio pesa entre 26 y 29 MB.</p>
+<h2>Lo que Hay que Arreglar en Español</h2>
+<p>Con el código de arriba, kokoro-onnx 0.3.9 truena antes de generar nada:</p>
+<div class="highlight"><pre><span></span><code>AssertionError: Language must be either en-us, en-gb, fr-fr, it, ja, cmn. Got es
+</code></pre></div>
+<p>El archivo de voces sí trae las de español, pero kokoro-onnx tiene una lista de idiomas permitidos y <code>"es"</code> no está. Se puede agregar desde tu código, sin modificar la librería instalada:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">kokoro_onnx</span>
+
+<span class="n">kokoro_onnx</span><span class="o">.</span><span class="n">SUPPORTED_LANGUAGES</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;es&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Con eso ya genera audio en español, pero con dos problemas: la pronunciación es la de España, y la r fuerte y la jota suenan como en inglés.</p>
+<h3>Castellano o Latinoamericano</h3>
+<p>espeak-ng tiene varias variantes de español. La que usa kokoro-onnx con <code>"es"</code> es la de España, así que la z y la c de "alcanza" o "dicen" salen con <code>θ</code>, el sonido de la <em>th</em> de "thin" en inglés. La variante latinoamericana se llama <code>es-419</code> y pronuncia esas letras como s. En estos dos clips el texto y la voz son los mismos, y lo único que cambia es la variante:</p>
+<figure class="audio">
+<div class="audio-fila"><span class="audio-etiqueta">Castellano, <code>es</code></span><audio controls preload="none" src="audio/dialecto-es.mp3"></audio></div>
+<div class="audio-fila"><span class="audio-etiqueta">Latinoamericano, <code>es-419</code></span><audio controls preload="none" src="audio/dialecto-es419.mp3"></audio></div>
+<figcaption class="chart-caption">Martí, “Nuestra América”. Voz <code>em_alex</code>, con los fonemas pasados directo al modelo en los dos.</figcaption>
+</figure>
+<div class="highlight"><pre><span></span><code>          alcanza    difícil    brazo    dicen
+es        alkˈanθa   ðifˈiθil   βɾˈaθo   ðˈiθen
+es-419    alkˈansa   ðifˈisil   βɾˈaso   ðˈisen
+</code></pre></div>
+<p>El model card dice que las voces de español se hicieron con espeak-ng <code>es</code>, la variante de España, así que probablemente se entrenaron con fonemas con <code>θ</code>. No lo pude confirmar, porque no publican los datos de entrenamiento. Aun así, la voz pronuncia bien los fonemas de <code>es-419</code>: el sonido s ya lo conoce, porque en España también se usa, en "casa" o "así". Para <em>El Capital</em> usé <code>es-419</code>.</p>
+<h3>Acento Inglés</h3>
+<p>El segundo problema viene de kokoro-onnx. Después de convertir el texto a fonemas con espeak-ng, hace cuatro reemplazos de símbolos. Están pensados para el inglés, pero los aplica a cualquier idioma:</p>
+<div class="highlight"><pre><span></span><code><span class="n">phonemes</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">phonemes</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ʲ&quot;</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;ɹ&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ɬ&quot;</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>En español, espeak-ng escribe con <code>r</code> la r fuerte, la de "perro", "tierra" o "recuento", y con <code>x</code> la jota, la de "hojas" o "gente". La r suave, la de "pero" o "cara", la escribe con otro símbolo, <code>ɾ</code>. Los reemplazos convierten la r fuerte en <code>ɹ</code>, la r del inglés, y la jota en k: "hojas" queda como "okas". La r suave no la tocan. El modelo sí conoce <code>r</code>, <code>x</code> y <code>ɾ</code>, así que en español estos reemplazos solo estropean la pronunciación.</p>
+<p>Los dos clips usan <code>es-419</code>, para que solo cambie esto. El primero pasa por los reemplazos y el segundo no. En el primero, "hojas" suena "okas" y la r de "ser" y "restallando" suena a inglés:</p>
+<figure class="audio">
+<div class="audio-fila"><span class="audio-etiqueta">Con los reemplazos (mal)</span><audio controls preload="none" src="audio/tokenizador-con.mp3"></audio></div>
+<div class="audio-fila"><span class="audio-etiqueta">Sin los reemplazos (bien)</span><audio controls preload="none" src="audio/tokenizador-sin.mp3"></audio></div>
+<figcaption class="chart-caption">Martí, “Nuestra América”. Los dos con fonemas de <code>es-419</code>; el primero pasa por los reemplazos de kokoro-onnx.</figcaption>
+</figure>
+<div class="highlight"><pre><span></span><code>                 ser    hojas   restallando
+con reemplazos   sˈeɹ   ˈokas   ɹˌestajjˈando
+sin reemplazos   sˈer   ˈoxas   rˌestajjˈando
+</code></pre></div>
+<p>Los dos problemas se arreglan igual. En lugar de dejar que kokoro-onnx convierta el texto a fonemas, lo convertimos nosotros con phonemizer, la misma librería que kokoro-onnx usa por dentro para llamar a espeak-ng, pero pidiéndole <code>es-419</code>. El resultado se le pasa a <code>create()</code> en el parámetro <code>phonemes</code>. Cuando recibe los fonemas ya hechos, kokoro-onnx no los vuelve a generar y tampoco les aplica los reemplazos. Así ya no hace falta agregar <code>"es"</code> a la lista de idiomas. El código queda así:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">kokoro_onnx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">phonemizer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sf</span>
+
+<span class="c1"># un lote de 510 fonemas exactos truena (ver abajo)</span>
+<span class="n">kokoro_onnx</span><span class="o">.</span><span class="n">MAX_PHONEME_LENGTH</span> <span class="o">=</span> <span class="mi">509</span>
+
+<span class="n">kokoro</span> <span class="o">=</span> <span class="n">kokoro_onnx</span><span class="o">.</span><span class="n">Kokoro</span><span class="p">(</span><span class="s2">&quot;kokoro-v1.0.onnx&quot;</span><span class="p">,</span> <span class="s2">&quot;voices-v1.0.bin&quot;</span><span class="p">)</span>
+
+<span class="c1"># Kokoro configura espeak-ng al crearse, así que esto va después</span>
+<span class="n">fonemas</span> <span class="o">=</span> <span class="n">phonemizer</span><span class="o">.</span><span class="n">phonemize</span><span class="p">(</span><span class="n">texto</span><span class="p">,</span> <span class="s2">&quot;es-419&quot;</span><span class="p">,</span> <span class="n">preserve_punctuation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_stress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">samples</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">kokoro</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">texto</span><span class="p">,</span> <span class="n">voice</span><span class="o">=</span><span class="s2">&quot;em_alex&quot;</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">phonemes</span><span class="o">=</span><span class="n">fonemas</span><span class="p">)</span>
+<span class="n">sf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;salida.mp3&quot;</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+</code></pre></div>
+<p>La diferencia completa, en una frase con z, rr y jota. El primer clip es kokoro-onnx tal como viene, solo con <code>"es"</code> agregado a la lista; el segundo tiene el arreglo:</p>
+<figure class="audio">
+<div class="audio-fila"><span class="audio-etiqueta">Como viene (mal)</span><audio controls preload="none" src="audio/fabrica-stock.mp3"></audio></div>
+<div class="audio-fila"><span class="audio-etiqueta">Con el arreglo (bien)</span><audio controls preload="none" src="audio/fabrica-arreglado.mp3"></audio></div>
+<figcaption class="chart-caption">Martí, “Nuestra América”. El primero usa <code>lang="es"</code>; el segundo, fonemas de <code>es-419</code> hechos aparte.</figcaption>
+</figure>
+<div class="highlight"><pre><span></span><code>             celosos    tierra   mejor    encajar
+como viene   θelˈosos   tjˈeɹa   mekˈoɾ   ˌenkakˈaɾ
+arreglado    selˈosos   tjˈera   mexˈoɾ   ˌenkaxˈaɾ
+</code></pre></div>
+<p>Whisper, que usamos de control, transcribió "el pueblo de Okas" en el clip con los reemplazos, y "cacar" en lugar de "encajar" en el que viene sin arreglar.</p>
+<h3>Números</h3>
+<p>Con los números hay dos problemas distintos, uno con kokoro-onnx tal como viene y otro con el arreglo. Antes de convertir a fonemas, kokoro-onnx normaliza el texto: reescribe números, abreviaturas y símbolos para que espeak-ng los lea bien. Las reglas son del inglés, así que parte los años en dos pares ("1891" como "18 91", igual que "eighteen ninety-one") y cambia el punto decimal por la palabra <code>point</code>:</p>
+<div class="highlight"><pre><span></span><code>texto        México, 30 de enero de 1891. El capítulo dura 110.4 minutos.
+normalizado  México, 30 de enero de 18 91. El capítulo dura 110 point 4 minutos.
+</code></pre></div>
+<p>Con el arreglo nos saltamos esa normalización. espeak-ng sí lee bien el año en español, "mil ochocientos noventa y uno", pero el decimal lo lee como dos números separados por una pausa, "ciento diez… cuatro", sin decir "punto". Lo más simple es escribir los números con letra antes de generar el audio. La frase de estos clips la inventé para oír los números:</p>
+<figure class="audio">
+<div class="audio-fila"><span class="audio-etiqueta">Como viene</span><audio controls preload="none" src="audio/numeros-stock.mp3"></audio></div>
+<div class="audio-fila"><span class="audio-etiqueta">Con el arreglo</span><audio controls preload="none" src="audio/numeros-es419.mp3"></audio></div>
+<div class="audio-fila"><span class="audio-etiqueta">Arreglo y decimal con letra</span><audio controls preload="none" src="audio/numeros-letra.mp3"></audio></div>
+<figcaption class="chart-caption">En el tercero, “110.4” va escrito “ciento diez punto cuatro”.</figcaption>
+</figure>
+<p>Los libros no tenían decimales. Los números sí complicaron los subtítulos: Whisper a veces escribe dígitos donde el texto tiene palabras, o al revés, así que el script de subtítulos convierte los dígitos a palabras antes de comparar.</p>
+<h2>¿Por Qué Se Oye Apurado?</h2>
+<p>A 1.0× el capítulo de <em>El Capital</em> me sonó apurado, y el audio que se quedó es a 0.75× (el parámetro <code>speed</code> de <code>create()</code>): pasó de 80.3 a 110.4 minutos.</p>
+<figure class="audio">
+<div class="audio-fila"><span class="audio-etiqueta">1.0×</span><audio controls preload="none" src="audio/velocidad-100.mp3"></audio></div>
+<div class="audio-fila"><span class="audio-etiqueta">0.75×</span><audio controls preload="none" src="audio/velocidad-075.mp3"></audio></div>
+<figcaption class="chart-caption">Primera oración de “Nuestra América”, con <code>em_alex</code> y fonemas de <code>es-419</code>.</figcaption>
+</figure>
+<p>Revisando para este post encontramos una causa probable. kokoro-onnx no le manda al modelo cada trozo completo: lo corta en lotes de hasta 510 fonemas, en la puntuación, porque es lo máximo que acepta el modelo en una llamada. El model card dice que las voces funcionan mejor con 100 a 200 fonemas por lote (ellos les dicen tokens), y que con más de 400 se apuran.</p>
+<p>Los trozos de 700 caracteres se escogieron pensando que eran unos 150 fonemas, pero cada carácter da como 1.1 fonemas. Un trozo de 700 caracteres son unos 700 fonemas, que kokoro-onnx parte en dos lotes grandes. En <em>El Capital</em>, 137 de los 282 lotes pasaron de 400.</p>
+<p>Lo probamos con los dos primeros párrafos de Martí a 1.0×, cambiando solo el tamaño máximo del lote. Con lotes de hasta 509 fonemas, como en los libros, el audio dura 99.7 segundos; con lotes de hasta 200, 109.1 segundos, un 9% más lento (de 21.8 a 19.9 fonemas por segundo). Es un solo texto con una sola voz, y no lo comparé contra el 0.75×.</p>
+<figure class="audio">
+<div class="audio-fila"><span class="audio-etiqueta">Lotes de hasta 509</span><audio controls preload="none" src="audio/lotes-509.mp3"></audio></div>
+<div class="audio-fila"><span class="audio-etiqueta">Lotes de hasta 200</span><audio controls preload="none" src="audio/lotes-200.mp3"></audio></div>
+<figcaption class="chart-caption">Los dos a 1.0×, recortados a los primeros 45 segundos.</figcaption>
+</figure>
+<h2>Un Fragmento Más Largo</h2>
+<p>Así queda con todo lo de arriba: los dos primeros párrafos de "Nuestra América", con <code>em_alex</code>, fonemas de <code>es-419</code> y a 0.75×.</p>
+<figure class="audio">
+<div class="audio-fila"><span class="audio-etiqueta"><code>em_alex</code>, 0.75×</span><audio controls preload="none" src="audio/final-marti.mp3"></audio></div>
+<figcaption class="chart-caption">José Martí, <a href="https://es.wikisource.org/wiki/Nuestra_Am%C3%A9rica">“Nuestra América”</a> (1891): la fecha y los dos primeros párrafos. 2 minutos 20 segundos.</figcaption>
+</figure>
+<h2>Otros Detalles</h2>
+<p>El CLI no corre en Python 3.13 o más nuevo; lo instalé con <code>uv tool install kokoro-tts</code> y Python 3.12. Aunque solo guardes a archivo, importa <code>sounddevice</code>, así que en Linux necesita PortAudio (<code>libportaudio2</code>). El modelo y las voces se bajan aparte: <code>kokoro-v1.0.onnx</code> (311 MB) y <code>voices-v1.0.bin</code> (25 MB). <code>soundfile</code> escribe MP3 directo, sin ffmpeg.</p>
+<p>kokoro-onnx 0.3.9 tiene un bug cuando un lote llega a exactamente 510 fonemas:</p>
+<div class="highlight"><pre><span></span><code>IndexError: index 510 is out of bounds for axis 0 with size 510
+</code></pre></div>
+<p>Cada voz de Kokoro es una tabla con 510 renglones, uno para cada largo posible del lote, y kokoro-onnx escoge el renglón según cuántos fonemas trae. Con 510 fonemas pide el renglón 510, que no existe, porque van del 0 al 509. Pasó en el trozo 68 de Nietzsche y mató la corrida. Se arregla bajando el límite a 509, como en el código de arriba.</p>
+<p>La "O" mayúscula del PDF de <em>El Capital</em> salía como cero en algunos estilos, en cinco lugares, incluidos dos títulos ("FORMA TOTAL 0 DESARROLLADA"). Kokoro habría dicho "cero". Lo encontramos después de la primera conversión y la relanzamos con el texto corregido.</p>
+<p>Al preparar los clips encontramos un bug en nuestro script que parte el libro en trozos: corta en cada punto, también en los decimales, y "110.4" quedaba como "110. 4". Los libros no tenían decimales, así que no los afectó.</p>
+<h2>Conclusión</h2>
+<p>Para oír un libro en español en mi máquina, Kokoro ya alcanza. Hay que pasarle los fonemas de <code>es-419</code> y escribir los números con letra; con eso, a 0.75×, el capítulo de Marx se escucha bien, y generarlo tardó menos de la tercera parte de lo que dura.</p>
+<p>Lo de los lotes de 200 fonemas falta probarlo con un libro completo, a ver si con eso ya no hace falta bajar la velocidad. Tampoco lo he comparado contra un TTS en la nube con el mismo texto.</p>
+<p>Las versiones son kokoro-onnx 0.3.9, kokoro-tts 2.3.2, <code>kokoro-v1.0.onnx</code> y <code>voices-v1.0.bin</code>, del 28 de septiembre de 2026.</p>
+                </div>
+            </article>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Cosme Zamudio. Todos los derechos reservados.</p>
+            <div class="social-links">
+                <a href="https://github.com/cosmez">GitHub</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
